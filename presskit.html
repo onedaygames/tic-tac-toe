@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Press Kit — Tic-Tac-Toe | One Day Games</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: #fef4e2;
+      color: #2c1a0e;
+      min-height: 100vh;
+    }
+
+    /* ── Hero ─────────────────────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(170deg,
+        #fff6cc 0%,
+        #fde07a 18%,
+        #f9b84a 38%,
+        #f09040 55%,
+        #c08060 72%,
+        #9a7055 88%,
+        #7a5840 100%
+      );
+      padding: 72px 24px 80px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 75% 55% at 50% 25%, rgba(255,248,180,0.55) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-logo {
+      width: 130px;
+      height: auto;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 4px 14px rgba(80,40,0,0.3));
+      position: relative;
+    }
+    .hero h1 {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(3.2rem, 9vw, 6rem);
+      background: linear-gradient(135deg, #7c3500 10%, #b45309 40%, #f59e0b 60%, #92400e 90%);
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(2px 3px 0 rgba(255,255,255,0.35));
+      line-height: 1.08;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .hero-desc {
+      font-size: 1.08rem;
+      font-weight: 700;
+      color: #4a2008;
+      max-width: 580px;
+      margin: 0 auto 16px;
+      line-height: 1.65;
+      position: relative;
+    }
+    .hero-tagline {
+      font-size: 1.2rem;
+      font-style: italic;
+      color: #6b3515;
+      font-weight: 600;
+      position: relative;
+    }
+
+    /* ── CTA Bar ──────────────────────────────────────────────────────────── */
+    .cta-bar {
+      background: #fff8eb;
+      border-bottom: 2px solid #f5d78a;
+      padding: 22px 24px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 30px;
+      border-radius: 50px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 0.97rem;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      cursor: pointer;
+      border: none;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      background: linear-gradient(135deg, #c2610a, #a84f08);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(160,80,8,0.55), 0 1px 0 rgba(255,255,255,0.12) inset;
+    }
+    .btn-primary:hover { box-shadow: 0 6px 24px rgba(160,80,8,0.7); }
+    .btn-secondary {
+      background: rgba(44,26,14,0.06);
+      color: #5c3011;
+      border: 2px solid rgba(44,26,14,0.14);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .btn-secondary:hover { background: rgba(44,26,14,0.11); }
+
+    /* ── Layout ───────────────────────────────────────────────────────────── */
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* ── Cards ────────────────────────────────────────────────────────────── */
+    .card {
+      background: linear-gradient(145deg, #fffdf5 0%, #fff8e8 100%);
+      border-radius: 22px;
+      padding: 32px 36px;
+      margin-bottom: 28px;
+      box-shadow: 0 2px 0 #f0d490, 0 8px 28px rgba(120,70,10,0.11);
+      border: 1px solid rgba(240,190,80,0.28);
+    }
+    .card h2 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.6rem;
+      color: #92400e;
+      margin-bottom: 22px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid rgba(245,158,11,0.18);
+    }
+
+    /* ── Fact Sheet ───────────────────────────────────────────────────────── */
+    .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 44px; }
+    .fact-row { display: flex; flex-direction: column; gap: 4px; }
+    .fact-label {
+      font-size: 0.64rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: #b45309;
+    }
+    .fact-value { font-size: 1rem; font-weight: 700; color: #1c1007; }
+    .fact-value a { color: #d97706; text-decoration: none; }
+    .fact-value a:hover { text-decoration: underline; }
+    .play-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 2px;
+      padding: 8px 22px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 800;
+      font-size: 0.9rem;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 3px 12px rgba(245,158,11,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .play-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 18px rgba(245,158,11,0.55);
+      text-decoration: none;
+    }
+
+    /* ── Body text ────────────────────────────────────────────────────────── */
+    .card p { line-height: 1.78; margin-bottom: 14px; font-size: 0.98rem; color: #3d2008; }
+    .card p:last-child { margin-bottom: 0; }
+    .card em { font-style: italic; color: #6b3515; }
+
+    /* ── Features ─────────────────────────────────────────────────────────── */
+    .features { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+    .features li {
+      font-size: 0.98rem;
+      padding-left: 26px;
+      position: relative;
+      color: #3d2008;
+      line-height: 1.55;
+    }
+    .features li::before {
+      content: "✦";
+      position: absolute;
+      left: 0;
+      color: #f59e0b;
+      font-size: 0.82rem;
+      top: 3px;
+    }
+
+    /* ── Media ────────────────────────────────────────────────────────────── */
+    .media-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .screenshot-wrap {
+      border-radius: 14px;
+      overflow: hidden;
+      background: #f3e0c0;
+      box-shadow: 0 4px 18px rgba(120,70,10,0.16);
+      cursor: zoom-in;
+    }
+    .screenshot-wrap img {
+      width: 100%;
+      display: block;
+      transition: transform 0.22s;
+    }
+    .screenshot-wrap:hover img { transform: scale(1.03); }
+    .screenshot-wide { grid-column: 1 / -1; }
+    .screenshot-placeholder {
+      width: 100%;
+      aspect-ratio: 16/9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #fde8b0, #f5d090);
+      color: #92400e;
+      font-weight: 700;
+      font-size: 0.88rem;
+      text-align: center;
+      padding: 20px;
+      gap: 10px;
+    }
+    .screenshot-placeholder .ph-icon { font-size: 2.2rem; }
+    .screenshot-caption {
+      padding: 9px 14px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #92400e;
+      background: rgba(250,230,160,0.5);
+      text-align: center;
+    }
+    .video-wrap {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 22px rgba(120,70,10,0.2);
+      margin-bottom: 10px;
+      aspect-ratio: 16/9;
+    }
+    .video-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .video-label {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #92400e;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .video-label a { color: #d97706; text-decoration: none; }
+    .video-label a:hover { text-decoration: underline; }
+
+    /* ── Links ────────────────────────────────────────────────────────────── */
+    .links { display: flex; flex-direction: column; gap: 13px; }
+    .link-row { display: flex; align-items: center; gap: 18px; }
+    .link-label {
+      font-size: 0.64rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+      color: #b45309;
+      min-width: 72px;
+    }
+    .link-row a { font-size: 0.98rem; font-weight: 700; color: #d97706; text-decoration: none; }
+    .link-row a:hover { text-decoration: underline; }
+
+    /* ── Contact ──────────────────────────────────────────────────────────── */
+    .contact-email { font-size: 1.18rem; font-weight: 800; margin: 8px 0; }
+    .contact-email a { color: #d97706; text-decoration: none; }
+    .contact-email a:hover { text-decoration: underline; }
+
+    /* ── Brand Assets ─────────────────────────────────────────────────────── */
+    .brand-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+    .brand-item { border-radius: 14px; overflow: hidden; box-shadow: 0 2px 12px rgba(120,70,10,0.12); border: 1px solid rgba(240,190,80,0.28); }
+    .brand-preview { padding: 24px 16px; display: flex; align-items: center; justify-content: center; min-height: 112px; }
+    .brand-preview.light { background: #ffffff; }
+    .brand-preview.dark  { background: #180e04; }
+    .brand-preview img   { max-width: 100%; max-height: 88px; object-fit: contain; }
+    .brand-meta { padding: 12px 14px; background: rgba(250,228,150,0.35); }
+    .brand-name { font-size: 0.74rem; font-weight: 800; color: #92400e; display: block; margin-bottom: 8px; }
+    .brand-dl   {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: #d97706;
+      text-decoration: none;
+      padding: 4px 12px;
+      border: 2px solid #f59e0b;
+      border-radius: 20px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .brand-dl:hover { background: #f59e0b; color: #fff; }
+
+    /* ── Lightbox ─────────────────────────────────────────────────────────── */
+    .lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(16,8,0,0.93);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      cursor: zoom-out;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 100%;
+      max-height: 90vh;
+      border-radius: 14px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.7);
+    }
+
+    /* ── Footer ───────────────────────────────────────────────────────────── */
+    .footer { text-align: center; padding: 0 0 48px; font-size: 0.82rem; color: #92400e; opacity: 0.65; }
+
+    /* ── Responsive ───────────────────────────────────────────────────────── */
+    @media (max-width: 620px) {
+      .facts      { grid-template-columns: 1fr; }
+      .media-grid { grid-template-columns: 1fr; }
+      .brand-grid { grid-template-columns: 1fr; }
+      .card       { padding: 24px 20px; }
+      .hero       { padding: 52px 20px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Hero ──────────────────────────────────────────────────────────────────── -->
+<div class="hero">
+  <img class="hero-logo" src="assets/one_day_games_art_only_large.png" alt="One Day Games"/>
+  <h1>Tic-Tac-Toe</h1>
+  <p class="hero-desc">A hand-crafted Tic-Tac-Toe in a living world, with ambient music, and a friendly CPU opponent — built in a single day, played in a browser.</p>
+  <div class="hero-tagline">A warm July afternoon that never quite ends.</div>
+</div>
+
+<!-- ── CTA Bar ────────────────────────────────────────────────────────────────── -->
+<div class="cta-bar">
+  <a class="btn btn-primary" href="https://onedaygames.itch.io/tic-tac-toe" target="_blank">▶&nbsp; Play Now — Free</a>
+  <a class="btn btn-secondary" href="assets/presskit.zip" download>⬇&nbsp; Download Press Kit</a>
+</div>
+
+<div class="wrap">
+
+  <!-- Fact Sheet -->
+  <div class="card">
+    <h2>Fact Sheet</h2>
+    <div class="facts">
+      <div class="fact-row">
+        <span class="fact-label">Developer</span>
+        <span class="fact-value">One Day Games</span>
+      </div>
+      <div class="fact-row">
+        <span class="fact-label">Platform</span>
+        <span class="fact-value">Browser (HTML5) — no install</span>
+      </div>
+      <div class="fact-row">
+        <span class="fact-label">Release Date</span>
+        <span class="fact-value">April 2026</span>
+      </div>
+      <div class="fact-row">
+        <span class="fact-label">Price</span>
+        <span class="fact-value">Free (pay what you want)</span>
+      </div>
+      <div class="fact-row">
+        <span class="fact-label">Genre</span>
+        <span class="fact-value">Puzzle / Casual</span>
+      </div>
+      <div class="fact-row">
+        <span class="fact-label">Players</span>
+        <span class="fact-value">1 (vs. CPU)</span>
+      </div>
+      <div class="fact-row">
+        <span class="fact-label">Built in</span>
+        <span class="fact-value">One day</span>
+      </div>
+      <div class="fact-row">
+        <span class="fact-label">Play Now</span>
+        <span class="fact-value">
+          <a href="https://onedaygames.itch.io/tic-tac-toe" target="_blank" style="color:#c2610a; font-weight:800; text-decoration:none;">▶ onedaygames.itch.io/tic-tac-toe</a>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Description -->
+  <div class="card">
+    <h2>Description</h2>
+    <p>A lovingly hand-crafted Tic-Tac-Toe built in a single day by One Day Games.</p>
+    <p>The board is carved wood. The sky is alive. Birds perch on the title. Squirrels hunt for acorns in the hills. The sun pulses. Flowers sway in the wind. A soft, dreamy soundtrack plays — generative ambient music that feels like a warm July afternoon that never quite ends.</p>
+    <p>Then you play Tic-Tac-Toe against a CPU that keeps things fun — challenging enough to stay interesting, friendly enough for young players to win.</p>
+    <p>The Night Shift update lets the same little world move from day to moonlight: lanterns, wisps, glowing flowers, cozy house light, and occasional shooting stars arrive without changing the game rules.</p>
+    <p>Made in a day. Played in minutes. Come back for one more round.</p>
+  </div>
+
+  <!-- Features -->
+  <div class="card">
+    <h2>Features</h2>
+    <ul class="features">
+      <li>Animated wood board with hand-crafted grain and texture</li>
+      <li>Living scenery — clouds, sun, swaying trees and flowers</li>
+      <li>Birds that fly across the sky and perch on the title</li>
+      <li>A bird house on the left — residents wave from the windows</li>
+      <li>Squirrels that seek acorns, grab them, and disappear</li>
+      <li>Dreamy generative ambient soundtrack — no two sessions sound the same</li>
+      <li>Night Shift atmosphere with moonlight, lanterns, wisps, glowing flowers, and shooting stars</li>
+      <li>Win fanfare with confetti, sun burst, and title explosion</li>
+      <li>Friendly AI opponent — a fair fight for players of all ages</li>
+      <li>Runs entirely in your browser, no install needed</li>
+    </ul>
+  </div>
+
+  <!-- Media -->
+  <div class="card">
+    <h2>Media</h2>
+    <div class="media-grid">
+      <div class="screenshot-wrap" onclick="openLightbox(this)">
+        <img src="assets/ttt-idle.png" alt="Idle scene — birds, squirrels, sunshine"/>
+        <div class="screenshot-caption">Idle scene — birds, squirrels, sunshine</div>
+      </div>
+      <div class="screenshot-wrap" onclick="openLightbox(this)">
+        <img src="assets/ttt-action.png" alt="In-game action"/>
+        <div class="screenshot-caption">In-game action</div>
+      </div>
+      <div class="screenshot-wrap screenshot-wide" onclick="openLightbox(this)">
+        <img src="assets/ttt-night-shooting-star-x.png" alt="Night Shift scene with shooting star"/>
+        <div class="screenshot-caption">Night Shift scene with shooting star</div>
+      </div>
+    </div>
+
+    <div class="video-wrap">
+      <iframe src="https://www.youtube.com/embed/eU768UtVfC8"
+              title="Tic-Tac-Toe — 1 Hour Ambient Loop"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen></iframe>
+    </div>
+    <div class="video-label">
+      Soundtrack — 1 Hour Ambient Loop &nbsp;·&nbsp;
+      <a href="https://www.youtube.com/watch?v=eU768UtVfC8" target="_blank">youtube.com/watch?v=eU768UtVfC8</a>
+    </div>
+
+    <p style="font-size:0.85rem; color:#92400e;">
+      High-resolution screenshots available on the
+      <a href="https://onedaygames.itch.io/tic-tac-toe" target="_blank" style="color:#d97706;">itch.io game page</a>.
+    </p>
+  </div>
+
+  <!-- About the Studio -->
+  <div class="card">
+    <h2>About the Studio</h2>
+    <p>When CJ Connoy was a kid, his dad took him to see the Apple II+ at the Apple store. The salesman asked if he liked video games. He said yes.</p>
+    <p>The salesman said: <em>"With this computer, you can make your own games. All by yourself."</em></p>
+    <p>He never forgot that. He also never learned to code. That was 1981.</p>
+    <p>45 years later, One Day Games is building browser games around that same promise: small, personal games anyone can play instantly.</p>
+    <p>One Day Games is a solo studio. We ship one game at a time, one day at a time.</p>
+  </div>
+
+  <!-- Links -->
+  <div class="card">
+    <h2>Links</h2>
+    <div class="links">
+      <div class="link-row">
+        <span class="link-label">Play</span>
+        <a href="https://onedaygames.itch.io/tic-tac-toe" target="_blank">onedaygames.itch.io/tic-tac-toe</a>
+      </div>
+      <div class="link-row">
+        <span class="link-label">YouTube</span>
+        <a href="https://www.youtube.com/watch?v=eU768UtVfC8" target="_blank">1 Hour Ambient Loop — youtube.com/watch?v=eU768UtVfC8</a>
+      </div>
+      <div class="link-row">
+        <span class="link-label">X / Twitter</span>
+        <a href="https://x.com/onedaygames_" target="_blank">x.com/onedaygames_</a>
+      </div>
+      <div class="link-row">
+        <span class="link-label">itch.io</span>
+        <a href="https://itch.io/profile/onedaygames" target="_blank">itch.io/profile/onedaygames</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Brand Assets -->
+  <div class="card">
+    <h2>Brand Assets</h2>
+    <div class="brand-grid">
+      <div class="brand-item">
+        <div class="brand-preview light">
+          <img src="assets/one_day_games_logo.png" alt="One Day Games logo — light"/>
+        </div>
+        <div class="brand-meta">
+          <span class="brand-name">Full Logo — Light BG</span>
+          <a class="brand-dl" href="assets/one_day_games_logo.png" download>Download PNG</a>
+        </div>
+      </div>
+      <div class="brand-item">
+        <div class="brand-preview dark">
+          <img src="assets/one_day_games_logo_dark_bg.png" alt="One Day Games logo — dark"/>
+        </div>
+        <div class="brand-meta">
+          <span class="brand-name">Full Logo — Dark BG</span>
+          <a class="brand-dl" href="assets/one_day_games_logo_dark_bg.png" download>Download PNG</a>
+        </div>
+      </div>
+      <div class="brand-item">
+        <div class="brand-preview light">
+          <img src="assets/one_day_games_art_only_large.png" alt="One Day Games mark"/>
+        </div>
+        <div class="brand-meta">
+          <span class="brand-name">Icon / Avatar Mark</span>
+          <a class="brand-dl" href="assets/one_day_games_art_only_large.png" download>Download PNG</a>
+        </div>
+      </div>
+    </div>
+    <p style="font-size:0.82rem; color:#92400e;">Use on white or dark backgrounds as indicated. Do not stretch or recolor. Attribution: One Day Games.</p>
+  </div>
+
+  <!-- Contact -->
+  <div class="card">
+    <h2>Contact</h2>
+    <p>For press inquiries, review copies, or interview requests:</p>
+    <p class="contact-email"><a href="mailto:play.onedaygames@gmail.com">play.onedaygames@gmail.com</a></p>
+    <p style="margin-top:12px; font-size:0.88rem; color:#92400e;">Response within 48 hours. One Day Games is a solo studio — you're talking directly to the developer.</p>
+    <p style="margin-top:16px; font-size:0.88rem;">Stay updated: <a href="https://one-day-games.beehiiv.com/subscribe" target="_blank" rel="noopener" style="color:#92400e; font-weight:700;">Subscribe to the One Day Games newsletter</a></p>
+  </div>
+
+  <div class="footer">
+    &copy; 2026 One Day Games &mdash; All assets hand-crafted in a single day.
+  </div>
+
+</div>
+
+<!-- ── Lightbox ────────────────────────────────────────────────────────────────── -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lightbox-img" src="" alt=""/>
+</div>
+
+<script>
+  function openLightbox(wrap) {
+    var img = wrap.querySelector('img');
+    if (!img) return;
+    document.getElementById('lightbox-img').src = img.src;
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeLightbox();
+  });
+</script>
+
+</body>
+</html>
