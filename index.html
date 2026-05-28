@@ -1303,7 +1303,7 @@
 </div>
 <!-- ── End mobile splash ──────────────────────────────────────────────────── -->
 
-<div id="build-stamp">DEV · 2026-05-28-0056</div>
+<div id="build-stamp" aria-hidden="true"></div>
 <button id="world-toggle" type="button" aria-label="Toggle day or night review mode">Toggle Day</button>
 <div class="night-sky" aria-hidden="true"></div>
 <div class="stars" aria-hidden="true"></div>
@@ -1638,15 +1638,52 @@
 </div>
 
 <script>
+  function getEnvironmentHost() {
+    return location.hostname.toLowerCase();
+  }
+
+  function isPrivateLanHost(host) {
+    return /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(host);
+  }
+
+  function isLocalReviewSurface() {
+    const host = getEnvironmentHost();
+    return host === 'localhost'
+      || host === '127.0.0.1'
+      || host === ''
+      || location.protocol === 'file:'
+      || isPrivateLanHost(host);
+  }
+
+  function isTttGithubPreviewSurface() {
+    return getEnvironmentHost() === 'onedaygames.github.io'
+      && /^\/tic-tac-toe(?:\/|$)/.test(location.pathname);
+  }
+
+  function isLivePublicSurface() {
+    const host = getEnvironmentHost();
+    return host === 'onedaygames.itch.io'
+      || host.endsWith('.itch.io')
+      || host === 'playonedaygames.com'
+      || host === 'www.playonedaygames.com'
+      || host === 'playonedaygames.pages.dev'
+      || (host === 'onedaygames.github.io' && /^\/onedaygames\/play\/live\/tic-tac-toe(?:\/|$)/.test(location.pathname));
+  }
+
+  function clearEnvironmentBadge(badge) {
+    badge.textContent = '';
+    badge.className = '';
+    badge.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('review-build');
+  }
+
   (function setEnvironmentBadge() {
     const badge = document.getElementById('build-stamp');
     if (!badge) return;
 
-    const host = location.hostname;
-    const isPrivateLan = /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[0-1])\.)/.test(host);
-    const isLocal = host === 'localhost' || host === '127.0.0.1' || host === '' || location.protocol === 'file:' || isPrivateLan;
-    const isPreview = host === 'onedaygames.github.io';
-    const isLive = host === 'onedaygames.itch.io' || host.endsWith('.itch.io');
+    const isLocal = isLocalReviewSurface();
+    const isPreview = isTttGithubPreviewSurface();
+    const isPublic = isLivePublicSurface();
     const isMobile = /Mobi|Android|iPhone|iPad|iPod|Touch/i.test(navigator.userAgent)
       || ('ontouchstart' in window && window.innerWidth < 900);
     const device = isMobile ? 'MOBILE' : 'DESKTOP';
@@ -1655,15 +1692,17 @@
     if (isLocal) {
       badge.textContent = device + ' REVIEW BUILD';
       badge.className = 'env-visible env-local' + mobileClass;
+      badge.setAttribute('aria-hidden', 'false');
       document.body.classList.add('review-build');
     } else if (isPreview) {
       badge.textContent = device + ' REVIEW BUILD';
       badge.className = 'env-visible env-preview' + mobileClass;
+      badge.setAttribute('aria-hidden', 'false');
       document.body.classList.add('review-build');
-    } else if (isLive) {
-      badge.textContent = '';
-      badge.className = '';
-      document.body.classList.remove('review-build');
+    } else if (isPublic) {
+      clearEnvironmentBadge(badge);
+    } else {
+      clearEnvironmentBadge(badge);
     }
   })();
 
@@ -2155,10 +2194,7 @@
   }
 
   function canUseFanfareDebugHost() {
-    return location.hostname === 'localhost'
-      || location.hostname === '127.0.0.1'
-      || location.hostname === ''
-      || location.hostname === 'onedaygames.github.io';
+    return isLocalReviewSurface() || isTttGithubPreviewSurface();
   }
 
   function installFanfareDebugHooks() {
