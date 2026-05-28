@@ -250,6 +250,38 @@
       border: none;
       display: block;
     }
+    .video-link {
+      position: relative;
+      display: block;
+      width: 100%;
+      height: 100%;
+      color: #2c1a0e;
+      text-decoration: none;
+      background: #1a2238;
+    }
+    .video-link img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .video-link span {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 10px 16px;
+      background: #f59e0b;
+      color: #2c1a0e;
+      font-weight: 900;
+      box-shadow: 0 3px 14px rgba(40,20,0,0.25);
+    }
+    .video-link:hover span,
+    .video-link:focus-visible span {
+      background: #fbbf24;
+    }
     .video-label {
       font-size: 0.86rem;
       font-weight: 700;
@@ -347,7 +379,7 @@
 <!-- ── CTA Bar ────────────────────────────────────────────────────────────────── -->
 <div class="cta-bar">
   <a class="btn btn-primary" href="https://onedaygames.itch.io/tic-tac-toe" target="_blank">▶&nbsp; Play Now — Free</a>
-  <a class="btn btn-secondary" href="assets/presskit.zip" download>⬇&nbsp; Download Press Kit</a>
+  <a class="btn btn-secondary" href="https://playonedaygames.com/live/tic-tac-toe/assets/presskit.zip" download>⬇&nbsp; Download Press Kit</a>
 </div>
 
 <div class="wrap">
@@ -439,10 +471,10 @@
     </div>
 
     <div class="video-wrap">
-      <iframe src="https://www.youtube.com/embed/eU768UtVfC8"
-              title="Tic-Tac-Toe — 1 Hour Ambient Loop"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen></iframe>
+      <a class="video-link" href="https://www.youtube.com/watch?v=eU768UtVfC8" target="_blank" rel="noopener" aria-label="Watch Tic-Tac-Toe one-hour ambient loop on YouTube">
+        <img src="assets/ttt-night-shooting-star-x.png" alt="Tic-Tac-Toe Night Shift ambient loop artwork">
+        <span>Watch on YouTube</span>
+      </a>
     </div>
     <div class="video-label">
       Soundtrack — 1 Hour Ambient Loop &nbsp;·&nbsp;
