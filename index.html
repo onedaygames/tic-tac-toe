@@ -116,7 +116,7 @@
   </style>
   <script>
     const mobileSplashParams = new URLSearchParams(location.search);
-    const skipMobileSplash = mobileSplashParams.has('skipSplash') || mobileSplashParams.has('qaFanfare') || mobileSplashParams.has('qaBoardPrize');
+    const skipMobileSplash = mobileSplashParams.has('skipSplash') || mobileSplashParams.has('qaFanfare') || mobileSplashParams.has('qaBoardPrize') || mobileSplashParams.has('qaBoardPrizeReplay');
     if (!skipMobileSplash && (/Mobi|Android|iPhone|iPad|iPod|Touch/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 900))) {
       document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('mobile-splash').style.display = 'block';
@@ -446,7 +446,7 @@
       position: absolute;
       top: -40px;
       left: 50%;
-      z-index: 9;
+      z-index: 11;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -1303,7 +1303,7 @@
 </div>
 <!-- ── End mobile splash ──────────────────────────────────────────────────── -->
 
-<div id="build-stamp">DEV · 2026-05-27-2352</div>
+<div id="build-stamp">DEV · 2026-05-28-0056</div>
 <button id="world-toggle" type="button" aria-label="Toggle day or night review mode">Toggle Day</button>
 <div class="night-sky" aria-hidden="true"></div>
 <div class="stars" aria-hidden="true"></div>
@@ -2055,11 +2055,6 @@
     pendingBoardPrize = clonePrize(prize);
   }
 
-  function clearActiveBoardPrizeForRound() {
-    activeBoardPrize = null;
-    clearBoardPrizeMascot();
-  }
-
   function showBoardPrizeMascot(prize) {
     if (!prize || !boardWrap) return;
     clearBoardPrizeMascot();
@@ -2238,12 +2233,15 @@
   }
 
   function scheduleQueryBoardPrize() {
-    if (!canUseFanfareDebugHost() || !cycleParams.has('qaBoardPrize')) return;
-    const kind = cycleParams.get('qaBoardPrize') || 'prize';
+    if (!canUseFanfareDebugHost() || (!cycleParams.has('qaBoardPrize') && !cycleParams.has('qaBoardPrizeReplay'))) return;
+    const kind = cycleParams.get('qaBoardPrize') || cycleParams.get('qaBoardPrizeReplay') || 'prize';
     setTimeout(() => {
       initGame();
       if (window.TTTDebug && typeof window.TTTDebug.forceBoardPrize === 'function') {
         window.TTTDebug.forceBoardPrize(kind);
+        if (cycleParams.has('qaBoardPrizeReplay')) {
+          showAttract('Play again!', 'Prize won', 'replay');
+        }
       }
     }, 850);
   }
@@ -2618,7 +2616,6 @@
 
   function endGame(winner, combo) {
     gameOver = true;
-    clearActiveBoardPrizeForRound();
     let replayLabel = 'Play again!';
     let replaySubtitle = 'One more round';
     let specialFanfare = null;
