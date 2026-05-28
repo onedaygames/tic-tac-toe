@@ -1,14 +1,14 @@
 {
-  "title": "Tic-Tac-Toe Theme - Canonical Take",
+  "title": "July",
   "role": "Founder-approved original Tic-Tac-Toe background music preservation asset.",
   "sourceGame": "One Day Games - Tic-Tac-Toe",
   "sourceImplementation": "index.html WebAudio background music block",
-  "seed": "ODG-TTT-THEME-CANONICAL-2026-05-27",
-  "renderedAt": "2026-05-28T06:08:07.762Z",
-  "renderer": "tools/render-ttt-theme-asset.mjs",
+  "takeId": "JULY-TTT-WEBAUDIO-APPROVED-001",
+  "renderedAt": "2026-05-28T06:30:00.000Z",
+  "renderer": "tools/render-july-theme-asset.mjs",
   "format": {
-    "wav": "assets/audio/ttt-theme-canonical-take.wav",
-    "mp3": "assets/audio/ttt-theme-canonical-take.mp3",
+    "wav": "assets/audio/july.wav",
+    "mp3": "assets/audio/july.mp3",
     "sampleRate": 44100,
     "channels": 2,
     "bitDepth": 16,
@@ -42,8 +42,13 @@
       3
     ],
     "arpRate": "8th notes",
-    "melody": "Seeded canonical take from the same chord melody pools used by the live WebAudio implementation.",
-    "liveNote": "The game implementation remains procedural; this file freezes one approved canonical take for reuse."
+    "instruments": [
+      "sine pluck fundamental",
+      "soft octave overtone",
+      "triangle bass pad",
+      "browser convolver reverb"
+    ],
+    "identity": "The approved Tic-Tac-Toe theme music, named July."
   },
   "chords": [
     {
@@ -123,55 +128,61 @@
     {
       "chord": "C",
       "time": 0.4054,
-      "frequency": 880,
-      "duration": 1.6216
-    },
-    {
-      "chord": "C",
-      "time": 2.027,
-      "frequency": 880,
-      "duration": 1.6216
-    },
-    {
-      "chord": "C",
-      "time": 3.6486,
-      "frequency": 523.25,
+      "frequency": 659.25,
       "duration": 1.2162
     },
     {
       "chord": "C",
-      "time": 5.2703,
+      "time": 1.2162,
       "frequency": 659.25,
+      "duration": 1.2162
+    },
+    {
+      "chord": "C",
+      "time": 2.8378,
+      "frequency": 880,
+      "duration": 1.2162
+    },
+    {
+      "chord": "C",
+      "time": 3.6486,
+      "frequency": 659.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "C",
+      "time": 5.2703,
+      "frequency": 523.25,
       "duration": 1.2162
     },
     {
       "chord": "G",
       "time": 6.8919,
       "frequency": 493.88,
-      "duration": 1.6216
+      "duration": 1.2162
     },
     {
       "chord": "G",
       "time": 7.7027,
       "frequency": 783.99,
-      "duration": 1.6216
+      "duration": 1.2162
     },
     {
       "chord": "G",
       "time": 9.3243,
       "frequency": 783.99,
-      "duration": 1.6216
+      "duration": 1.2162
     },
     {
       "chord": "G",
-      "time": 10.1351,
+      "time": 10.9459,
       "frequency": 493.88,
       "duration": 1.2162
     },
     {
       "chord": "G",
       "time": 11.7568,
-      "frequency": 783.99,
+      "frequency": 587.33,
       "duration": 1.6216
     },
     {
@@ -182,32 +193,44 @@
     },
     {
       "chord": "Am",
+      "time": 14.1892,
+      "frequency": 523.25,
+      "duration": 1.2162
+    },
+    {
+      "chord": "Am",
       "time": 15,
-      "frequency": 659.25,
+      "frequency": 880,
       "duration": 1.6216
     },
     {
       "chord": "Am",
       "time": 16.6216,
-      "frequency": 659.25,
-      "duration": 1.2162
+      "frequency": 440,
+      "duration": 1.6216
     },
     {
       "chord": "Am",
       "time": 18.2432,
-      "frequency": 880,
-      "duration": 1.6216
+      "frequency": 440,
+      "duration": 1.2162
     },
     {
       "chord": "F",
       "time": 19.8649,
+      "frequency": 523.25,
+      "duration": 1.2162
+    },
+    {
+      "chord": "F",
+      "time": 20.6757,
       "frequency": 880,
       "duration": 1.6216
     },
     {
       "chord": "F",
       "time": 21.4865,
-      "frequency": 523.25,
+      "frequency": 698.46,
       "duration": 1.2162
     },
     {
@@ -219,14 +242,14 @@
     {
       "chord": "F",
       "time": 23.9189,
-      "frequency": 523.25,
-      "duration": 1.6216
+      "frequency": 880,
+      "duration": 1.2162
     },
     {
       "chord": "F",
       "time": 24.7297,
-      "frequency": 880,
-      "duration": 1.6216
+      "frequency": 523.25,
+      "duration": 1.2162
     }
   ],
   "mastering": {
@@ -234,7 +257,7 @@
     "dryGain": 0.5,
     "wetGain": 0.5,
     "normalizedPeak": 0.78,
-    "preNormalizePeak": 0.01859066,
-    "assetGain": 41.95654471
+    "preNormalizePeak": 0.02834624,
+    "assetGain": 27.5168747
   }
 }

@@ -1,0 +1,15 @@
+July
+
+Purpose:
+Preserve the founder-approved original Tic-Tac-Toe background music as a reusable project asset.
+
+Files:
+- july.wav: archival 16-bit stereo WAV.
+- july.mp3: portable 192 kbps MP3.
+- july.recipe.json: source recipe, July metadata, chord pools, melody events, and render details.
+
+Source:
+Rendered with the browser WebAudio API from the Tic-Tac-Toe music design in index.html: 74 BPM, C-G-Am-F, two bars per chord, harp-like plucks, soft bass pad, and the approved TTT melody behavior.
+
+Important:
+Do not delete or replace these files casually. This is an early One Day Games / Tic-Tac-Toe creative artifact that CJ directed, approved, and named July.
