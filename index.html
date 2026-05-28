@@ -116,7 +116,7 @@
   </style>
   <script>
     const mobileSplashParams = new URLSearchParams(location.search);
-    const skipMobileSplash = mobileSplashParams.has('skipSplash') || mobileSplashParams.has('qaFanfare');
+    const skipMobileSplash = mobileSplashParams.has('skipSplash') || mobileSplashParams.has('qaFanfare') || mobileSplashParams.has('qaBoardPrize');
     if (!skipMobileSplash && (/Mobi|Android|iPhone|iPad|iPod|Touch/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 900))) {
       document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('mobile-splash').style.display = 'block';
@@ -440,6 +440,60 @@
     @keyframes boardGlow {
       0%,100% { box-shadow: 0 10px 0 #7a3e0a, 0 15px 36px rgba(0,0,0,0.44), 0 3px 0 rgba(255,215,130,0.38) inset, 0 -2px 0 rgba(50,20,2,0.28) inset; }
       50%     { box-shadow: 0 10px 0 #7a3e0a, 0 15px 36px rgba(0,0,0,0.44), 0 3px 0 rgba(255,215,130,0.38) inset, 0 -2px 0 rgba(50,20,2,0.28) inset, 0 0 0 7px rgba(253,224,71,0.42), 0 0 44px 12px rgba(253,224,71,0.22); }
+    }
+
+    .board-prize-mascot {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      z-index: 9;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      max-width: min(86vw, 260px);
+      padding: 5px 10px 5px 6px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,244,205,0.90));
+      border: 1.5px solid rgba(255,255,255,0.95);
+      box-shadow:
+        0 7px 18px rgba(64,35,8,0.20),
+        0 0 0 3px rgba(255,222,92,0.16);
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      animation: boardPrizeDance 1.38s ease-in-out infinite;
+      will-change: transform;
+    }
+    .board-prize-icon {
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      filter: drop-shadow(0 4px 5px rgba(88,40,8,0.20));
+    }
+    .board-prize-icon .fanfare-prize-svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+    .board-prize-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.74rem;
+      font-weight: 1000;
+      line-height: 1;
+      letter-spacing: 0;
+      text-transform: uppercase;
+      color: #78350f;
+      text-shadow: 0 1px 0 rgba(255,255,255,0.86);
+    }
+    @keyframes boardPrizeDance {
+      0%,100% { transform: translate(-50%, 0) rotate(-2deg); }
+      24%     { transform: translate(calc(-50% - 10px), -8px) rotate(3deg); }
+      50%     { transform: translate(-50%, -2px) rotate(-1deg); }
+      76%     { transform: translate(calc(-50% + 10px), -8px) rotate(3deg); }
     }
 
     .board {
@@ -1140,6 +1194,20 @@
         border-radius: 19px;
         transform: translateY(var(--mobile-board-reach-offset));
       }
+      .board-prize-mascot {
+        top: -42px;
+        gap: 5px;
+        max-width: min(88vw, 230px);
+        padding: 4px 8px 4px 5px;
+      }
+      .board-prize-icon {
+        width: 34px;
+        height: 34px;
+        flex-basis: 34px;
+      }
+      .board-prize-name {
+        font-size: 0.64rem;
+      }
       .scores    { gap: 8px; }
       .score-box { padding: 4px 10px; border-radius: 12px; }
       .score-value { font-size: 1.12rem; }
@@ -1235,7 +1303,7 @@
 </div>
 <!-- ── End mobile splash ──────────────────────────────────────────────────── -->
 
-<div id="build-stamp">DEV · 2026-05-27-2259</div>
+<div id="build-stamp">DEV · 2026-05-27-2352</div>
 <button id="world-toggle" type="button" aria-label="Toggle day or night review mode">Toggle Day</button>
 <div class="night-sky" aria-hidden="true"></div>
 <div class="stars" aria-hidden="true"></div>
@@ -1612,6 +1680,9 @@
   let playerWinStreak = 0;
   let totalPlayerWins = 0;
   let fanfareTimer = null;
+  let p0Mode = false;
+  let activeBoardPrize = null;
+  let pendingBoardPrize = null;
 
   const cells        = [...document.querySelectorAll('.cell')];
   const statusEl     = document.getElementById('status');
@@ -1870,6 +1941,7 @@
     playerMovesThisRound = 0;
     playerWinStreak = 0;
     totalPlayerWins = 0;
+    resetBoardPrizeCarry();
   }
 
   function prizeForMilestone(totalWins) {
@@ -1884,7 +1956,7 @@
     return {
       kind: 'prize',
       title: totalWins === 12 ? "THAT'S 12 WINS!" : "THAT'S 12 MORE WINS!",
-      subtitle: `Arcade prize: ${prize.name}`,
+      subtitle: prize.name,
       replaySubtitle: 'Prize won',
       duration: 3300,
       prize,
@@ -1963,6 +2035,66 @@
       default:
         return `${base}${shadow}${stem}${leaf}<path d="M61 28 C77 31 78 51 71 61 C89 70 86 101 60 101 C34 101 31 70 49 61 C42 51 45 31 61 28Z" fill="${prize.main}"/>${shine}<path d="M50 62 C58 68 67 68 75 62" fill="none" stroke="${prize.accent}" stroke-width="5" stroke-linecap="round" opacity="0.62"/></svg>`;
     }
+  }
+
+  function clonePrize(prize) {
+    return prize ? { ...prize } : null;
+  }
+
+  function clearBoardPrizeMascot() {
+    document.getElementById('board-prize-mascot')?.remove();
+  }
+
+  function resetBoardPrizeCarry() {
+    activeBoardPrize = null;
+    pendingBoardPrize = null;
+    clearBoardPrizeMascot();
+  }
+
+  function queueBoardPrize(prize) {
+    pendingBoardPrize = clonePrize(prize);
+  }
+
+  function clearActiveBoardPrizeForRound() {
+    activeBoardPrize = null;
+    clearBoardPrizeMascot();
+  }
+
+  function showBoardPrizeMascot(prize) {
+    if (!prize || !boardWrap) return;
+    clearBoardPrizeMascot();
+
+    const mascot = document.createElement('div');
+    mascot.id = 'board-prize-mascot';
+    mascot.className = 'board-prize-mascot';
+    mascot.setAttribute('role', 'status');
+    mascot.setAttribute('aria-label', `Current prize: ${prize.name}`);
+
+    const icon = document.createElement('div');
+    icon.className = 'board-prize-icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.innerHTML = renderPrizeSvg(prize);
+
+    const name = document.createElement('div');
+    name.className = 'board-prize-name';
+    name.textContent = prize.name;
+
+    mascot.appendChild(icon);
+    mascot.appendChild(name);
+    boardWrap.appendChild(mascot);
+  }
+
+  function showPendingBoardPrizeForRound() {
+    clearBoardPrizeMascot();
+    if (p0Mode) {
+      activeBoardPrize = null;
+      return;
+    }
+    if (pendingBoardPrize) {
+      activeBoardPrize = clonePrize(pendingBoardPrize);
+      pendingBoardPrize = null;
+    }
+    if (activeBoardPrize) showBoardPrizeMascot(activeBoardPrize);
   }
 
   function showSpecialFanfare(event) {
@@ -2051,6 +2183,7 @@
           collisionStreak: chooseSpecialFanfare(3, 3, 3),
         };
         const event = events[kind] || events.quick;
+        if (event.kind === 'prize' && event.prize) queueBoardPrize(event.prize);
         showSpecialFanfare(event);
         return event;
       },
@@ -2063,8 +2196,27 @@
         if (Number.isFinite(next.playerMovesThisRound)) playerMovesThisRound = Math.max(0, Math.floor(next.playerMovesThisRound));
         return this.fanfareState();
       },
+      forceBoardPrize(kind = 'prize') {
+        const requestedWins = parseInt(kind, 10);
+        const totalWins = Number.isFinite(requestedWins) && requestedWins > 0
+          ? requestedWins
+          : (['more12', 'prize24'].includes(kind) ? 24 : 12);
+        const event = makeDozenFanfare(totalWins);
+        activeBoardPrize = clonePrize(event.prize);
+        pendingBoardPrize = null;
+        boardOverlay.classList.remove('visible');
+        boardWrap.classList.remove('attract');
+        showBoardPrizeMascot(activeBoardPrize);
+        return activeBoardPrize;
+      },
       fanfareState() {
-        return { totalPlayerWins, playerWinStreak, playerMovesThisRound };
+        return {
+          totalPlayerWins,
+          playerWinStreak,
+          playerMovesThisRound,
+          activeBoardPrize: activeBoardPrize ? activeBoardPrize.name : null,
+          pendingBoardPrize: pendingBoardPrize ? pendingBoardPrize.name : null,
+        };
       },
     });
   }
@@ -2074,11 +2226,24 @@
     const kind = cycleParams.get('qaFanfare') || 'quick';
     setTimeout(() => {
       if (window.TTTDebug && typeof window.TTTDebug.forceFanfare === 'function') {
+        initGame();
         const event = window.TTTDebug.forceFanfare(kind);
         if (cycleParams.has('qaReplay')) {
-          const replayDelay = _isMobile ? 1300 : 650;
+          const baseReplayDelay = _isMobile ? 1300 : 650;
+          const replayDelay = Math.max(baseReplayDelay, (event.duration || 2600) + 180);
           setTimeout(() => showAttract('Play again!', event.replaySubtitle || 'One more round', 'replay'), replayDelay);
         }
+      }
+    }, 850);
+  }
+
+  function scheduleQueryBoardPrize() {
+    if (!canUseFanfareDebugHost() || !cycleParams.has('qaBoardPrize')) return;
+    const kind = cycleParams.get('qaBoardPrize') || 'prize';
+    setTimeout(() => {
+      initGame();
+      if (window.TTTDebug && typeof window.TTTDebug.forceBoardPrize === 'function') {
+        window.TTTDebug.forceBoardPrize(kind);
       }
     }, 850);
   }
@@ -2099,6 +2264,7 @@
     boardWrap.classList.remove('attract');
     document.body.classList.remove('round-reaction', 'reaction-cpu', 'reaction-draw');
     setStatus('Your turn', '');
+    showPendingBoardPrizeForRound();
   }
 
   function svgX() {
@@ -2452,12 +2618,14 @@
 
   function endGame(winner, combo) {
     gameOver = true;
+    clearActiveBoardPrizeForRound();
     let replayLabel = 'Play again!';
     let replaySubtitle = 'One more round';
+    let specialFanfare = null;
     if (winner) {
       combo.forEach(i => cells[i].classList.add('winner'));
       if (winner === 'X') {
-        const specialFanfare = p0Mode ? null : recordPlayerWinAndPickFanfare();
+        specialFanfare = p0Mode ? null : recordPlayerWinAndPickFanfare();
         scores.X++;
         scoreX.textContent = scores.X;
         track('player_win', {
@@ -2468,6 +2636,7 @@
         setStatus('You win! 🎉', 'win-x');
         titleBurst();
         if (specialFanfare) {
+          if (specialFanfare.kind === 'prize' && specialFanfare.prize) queueBoardPrize(specialFanfare.prize);
           showSpecialFanfare(specialFanfare);
           replaySubtitle = specialFanfare.replaySubtitle || 'Nice win';
         } else {
@@ -2503,7 +2672,10 @@
       const session = gameSession;
       setTimeout(() => { if (p0Mode && session === gameSession) { initGame(); setTimeout(p0XTurn, 800); } }, 3200);
     } else {
-      const replayDelay = _isMobile ? 1300 : 650;
+      const baseReplayDelay = _isMobile ? 1300 : 650;
+      const replayDelay = specialFanfare
+        ? Math.max(baseReplayDelay, (specialFanfare.duration || 2600) + 180)
+        : baseReplayDelay;
       setTimeout(() => showAttract(replayLabel, replaySubtitle, 'replay'), replayDelay);
     }
   }
@@ -2589,6 +2761,7 @@
   initGame();
   showAttract();
   scheduleQueryFanfare();
+  scheduleQueryBoardPrize();
   setWorldPhase(cycleParams.has('day') ? 'day' : 'night', cycleParams.has('day') ? 'query' : 'load');
   scheduleWorldCycle();
   scheduleShootingStar();
@@ -2598,7 +2771,6 @@
   // Triggers: 45s idle | URL ?demo or ?p0 | press 0 (zero key)
   // Exit: press 0 again, Escape, or any player click. Reclaim always starts fresh.
 
-  let p0Mode    = false;
   let p0Timer   = null;
   let idleTimer = null;
   const P0_IDLE = 45000;
