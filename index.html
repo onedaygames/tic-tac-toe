@@ -926,24 +926,46 @@
 
     /* ── Mobile layout (portrait touch devices) ─────────────────────────────── */
     @media (max-width: 500px) {
-      /* Respect iPhone notch / home indicator safe areas */
-      body { padding-bottom: max(env(safe-area-inset-bottom, 10px), 10px); }
-      h1   { font-size: clamp(2.2rem, 10vw, 3rem); }
-      .cell {
-        width:  clamp(72px, 22vw, 96px);
-        height: clamp(72px, 22vw, 96px);
+      /* Compose around the real visible viewport so phone browser chrome leaves a meadow lane. */
+      body {
+        height: 100svh;
+        height: 100dvh;
+        min-height: 100svh;
+        align-items: center;
+        justify-content: flex-start;
+        padding: max(env(safe-area-inset-top, 8px), 8px) 0 max(env(safe-area-inset-bottom, 8px), 8px);
       }
-      .board     { gap: 6px; }
-      .board-wrap{ padding: 9px; border-radius: 19px; }
-      .scores    { gap: 10px; }
-      .score-box { padding: 4px 12px; border-radius: 12px; }
-      .score-value { font-size: 1.2rem; }
-      .status    { font-size: 0.88rem; padding: 5px 14px; min-width: 140px; }
-      .container { gap: clamp(4px, 1.2vh, 9px); }
+      h1   { font-size: clamp(2rem, 9vw, 2.65rem); }
+      .cell {
+        width:  clamp(58px, 17vw, 70px);
+        height: clamp(58px, 17vw, 70px);
+      }
+      .board     { gap: 5px; }
+      .board-wrap{ padding: 7px; border-radius: 17px; }
+      .scores    { gap: 8px; }
+      .score-box { padding: 4px 10px; border-radius: 12px; }
+      .score-value { font-size: 1.12rem; }
+      .status    { font-size: 0.82rem; padding: 4px 13px; min-width: 132px; }
+      .p0-demo-badge { min-height: 24px; padding: 4px 11px 5px; font-size: 0.66rem; }
+      .container {
+        width: 100%;
+        min-height: 100%;
+        justify-content: flex-start;
+        gap: clamp(3px, 0.85svh, 6px);
+        padding-top: clamp(6px, 1.8svh, 13px);
+      }
       /* Enlarge overlay play prompt for fat fingers */
-      .play-label { font-size: 2.8rem; }
-      .play-arrow { font-size: 2rem; }
-      .play-subtitle { font-size: 0.72rem; letter-spacing: 0.12em; }
+      .play-label { font-size: 2.2rem; }
+      .play-arrow { font-size: 1.55rem; }
+      .play-subtitle { font-size: 0.66rem; letter-spacing: 0.1em; }
+      .board-overlay.replay .play-label {
+        max-width: 92%;
+        font-size: 1.85rem;
+        line-height: 0.96;
+        letter-spacing: 0.03em;
+        text-align: center;
+      }
+      .board-overlay.replay .play-arrow { font-size: 1.4rem; }
     }
 
     /* === Bird House === */
@@ -1015,7 +1037,7 @@
 </div>
 <!-- ── End mobile splash ──────────────────────────────────────────────────── -->
 
-<div id="build-stamp">DEV · 2026-05-27-1759</div>
+<div id="build-stamp">DEV · 2026-05-27-1819</div>
 <button id="world-toggle" type="button" aria-label="Toggle day or night review mode">Toggle Day</button>
 <div class="night-sky" aria-hidden="true"></div>
 <div class="stars" aria-hidden="true"></div>
@@ -3099,7 +3121,13 @@
     const acorns = ACORN_DEFS.map((def, idx) => ({
       idx,
       get x() { return def.rx * cv.width; },
-      get y() { return Math.min(cv.height - 14, def.ry * cv.height + 44); },
+      get y() {
+        const mobileLane = window.matchMedia && window.matchMedia('(max-width: 500px)').matches;
+        return Math.min(
+          cv.height - (mobileLane ? 42 : 14),
+          def.ry * cv.height + (mobileLane ? 8 : 44)
+        );
+      },
       visible: true,
       claimed: false,
       respawnIn: 0,
@@ -3234,7 +3262,7 @@
     }
 
     const squirrels = [];
-    let tick = 0, nextSpawn = 200;
+    let tick = 0, nextSpawn = (window.matchMedia && window.matchMedia('(max-width: 500px)').matches) ? 80 : 200;
 
     function loop() {
       ctx.clearRect(0, 0, cv.width, cv.height);
