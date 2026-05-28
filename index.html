@@ -937,11 +937,11 @@
       }
       h1   { font-size: clamp(2rem, 9vw, 2.65rem); }
       .cell {
-        width:  clamp(72px, 22vw, 96px);
-        height: clamp(72px, 22vw, 96px);
+        width:  clamp(74px, 23vw, 98px);
+        height: clamp(74px, 23vw, 98px);
       }
       .board     { gap: 6px; }
-      .board-wrap{ padding: 9px; border-radius: 19px; }
+      .board-wrap{ margin-top: 7px; padding: 9px; border-radius: 19px; }
       .scores    { gap: 8px; }
       .score-box { padding: 4px 10px; border-radius: 12px; }
       .score-value { font-size: 1.12rem; }
@@ -955,12 +955,12 @@
         padding-top: clamp(6px, 1.8svh, 13px);
       }
       /* Enlarge overlay play prompt for fat fingers */
-      .play-label { font-size: 2.75rem; }
+      .play-label { font-size: 2.85rem; }
       .play-arrow { font-size: 1.95rem; }
       .play-subtitle { font-size: 0.66rem; letter-spacing: 0.1em; }
       .board-overlay.replay .play-label {
         max-width: 92%;
-        font-size: 2.2rem;
+        font-size: 2.28rem;
         line-height: 0.96;
         letter-spacing: 0.03em;
         text-align: center;
@@ -1037,7 +1037,7 @@
 </div>
 <!-- ── End mobile splash ──────────────────────────────────────────────────── -->
 
-<div id="build-stamp">DEV · 2026-05-27-1837</div>
+<div id="build-stamp">DEV · 2026-05-27-1846</div>
 <button id="world-toggle" type="button" aria-label="Toggle day or night review mode">Toggle Day</button>
 <div class="night-sky" aria-hidden="true"></div>
 <div class="stars" aria-hidden="true"></div>
@@ -3125,8 +3125,8 @@
         const mobileLane = window.matchMedia && window.matchMedia('(max-width: 500px)').matches;
         if (!mobileLane) return Math.min(cv.height - 14, def.ry * cv.height + 44);
         const boardRect = document.getElementById('board-wrap')?.getBoundingClientRect();
-        const laneTop = boardRect ? boardRect.bottom + 38 : cv.height * 0.82;
-        const laneBottom = cv.height - 42;
+        const laneTop = boardRect ? boardRect.bottom + 24 : cv.height * 0.82;
+        const laneBottom = cv.height - 36;
         const hillsideY = def.ry * cv.height + 28;
         return Math.min(laneBottom, Math.max(laneTop, hillsideY));
       },
