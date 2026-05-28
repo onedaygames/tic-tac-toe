@@ -2705,7 +2705,9 @@
       const session = gameSession;
       setTimeout(() => { if (p0Mode && session === gameSession) { initGame(); setTimeout(p0XTurn, 800); } }, 3200);
     } else {
-      const baseReplayDelay = _isMobile ? 1300 : 650;
+      const baseReplayDelay = winner
+        ? (_isMobile ? 1300 : 650)
+        : (_isMobile ? 620 : 420);
       const replayDelay = specialFanfare
         ? Math.max(baseReplayDelay, (specialFanfare.duration || 2600) + 180)
         : baseReplayDelay;
