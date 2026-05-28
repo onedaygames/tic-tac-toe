@@ -8,6 +8,7 @@ Files:
 - july.mp3: exact game-cycle loop, portable 192 kbps MP3.
 - july-with-tail.wav: one July cycle plus reverb tail for standalone playback.
 - july-with-tail.mp3: portable tail render.
+- july-long-12min.mp3: long listening version built from the exact July loop.
 - july.recipe.json: source recipe, July metadata, chord pools, melody events, and render details.
 
 Source:

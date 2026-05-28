@@ -16,8 +16,10 @@ const WAV_PATH = path.join(OUT_DIR, 'july.wav');
 const MP3_PATH = path.join(OUT_DIR, 'july.mp3');
 const TAIL_WAV_PATH = path.join(OUT_DIR, 'july-with-tail.wav');
 const TAIL_MP3_PATH = path.join(OUT_DIR, 'july-with-tail.mp3');
+const LONG_MP3_PATH = path.join(OUT_DIR, 'july-long-12min.mp3');
 const RECIPE_PATH = path.join(OUT_DIR, 'july.recipe.json');
 const NOTES_PATH = path.join(OUT_DIR, 'july.notes.txt');
+const LONG_VERSION_SECONDS = 12 * 60;
 
 const renderResult = await renderJulyInBrowser();
 await mkdir(OUT_DIR, { recursive: true });
@@ -35,6 +37,7 @@ await writeFile(NOTES_PATH, [
   '- july.mp3: exact game-cycle loop, portable 192 kbps MP3.',
   '- july-with-tail.wav: one July cycle plus reverb tail for standalone playback.',
   '- july-with-tail.mp3: portable tail render.',
+  '- july-long-12min.mp3: long listening version built from the exact July loop.',
   '- july.recipe.json: source recipe, July metadata, chord pools, melody events, and render details.',
   '',
   'Source:',
@@ -81,10 +84,33 @@ if (tailFfmpeg.status !== 0) {
   throw new Error('ffmpeg failed while creating july-with-tail.mp3');
 }
 
+const longFfmpeg = spawnSync('ffmpeg', [
+  '-y',
+  '-hide_banner',
+  '-loglevel',
+  'error',
+  '-stream_loop',
+  '-1',
+  '-i',
+  WAV_PATH,
+  '-t',
+  String(LONG_VERSION_SECONDS),
+  '-codec:a',
+  'libmp3lame',
+  '-b:a',
+  '192k',
+  LONG_MP3_PATH,
+], { stdio: 'inherit' });
+
+if (longFfmpeg.status !== 0) {
+  throw new Error('ffmpeg failed while creating july-long-12min.mp3');
+}
+
 console.log(`Wrote ${WAV_PATH}`);
 console.log(`Wrote ${MP3_PATH}`);
 console.log(`Wrote ${TAIL_WAV_PATH}`);
 console.log(`Wrote ${TAIL_MP3_PATH}`);
+console.log(`Wrote ${LONG_MP3_PATH}`);
 console.log(`Wrote ${RECIPE_PATH}`);
 console.log(`Wrote ${NOTES_PATH}`);
 
@@ -106,6 +132,7 @@ async function renderJulyInBrowser() {
     const REVERB_TAIL_SECONDS = 3.5;
     const RENDER_CYCLES = 3;
     const RENDER_SECONDS = LOOP_SECONDS * RENDER_CYCLES + REVERB_TAIL_SECONDS;
+    const LONG_VERSION_SECONDS = 12 * 60;
     const OfflineCtx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
 
     if (!OfflineCtx) {
@@ -349,11 +376,13 @@ async function renderJulyInBrowser() {
           mp3: 'assets/audio/july.mp3',
           wavWithTail: 'assets/audio/july-with-tail.wav',
           mp3WithTail: 'assets/audio/july-with-tail.mp3',
+          mp3Long12Minute: 'assets/audio/july-long-12min.mp3',
           sampleRate: SAMPLE_RATE,
           channels: 2,
           bitDepth: 16,
           loopDurationSeconds: Number(LOOP_SECONDS.toFixed(6)),
           withTailDurationSeconds: Number((LOOP_SECONDS + REVERB_TAIL_SECONDS).toFixed(6)),
+          longVersionDurationSeconds: LONG_VERSION_SECONDS,
         },
         composition: {
           bpm: BPM,

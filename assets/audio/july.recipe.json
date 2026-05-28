@@ -11,11 +11,13 @@
     "mp3": "assets/audio/july.mp3",
     "wavWithTail": "assets/audio/july-with-tail.wav",
     "mp3WithTail": "assets/audio/july-with-tail.mp3",
+    "mp3Long12Minute": "assets/audio/july-long-12min.mp3",
     "sampleRate": 44100,
     "channels": 2,
     "bitDepth": 16,
     "loopDurationSeconds": 25.145946,
-    "withTailDurationSeconds": 28.645946
+    "withTailDurationSeconds": 28.645946,
+    "longVersionDurationSeconds": 720
   },
   "composition": {
     "bpm": 74,
