@@ -9,10 +9,13 @@
   "format": {
     "wav": "assets/audio/july.wav",
     "mp3": "assets/audio/july.mp3",
+    "wavWithTail": "assets/audio/july-with-tail.wav",
+    "mp3WithTail": "assets/audio/july-with-tail.mp3",
     "sampleRate": 44100,
     "channels": 2,
     "bitDepth": 16,
-    "durationSeconds": 29.445946
+    "loopDurationSeconds": 25.145946,
+    "withTailDurationSeconds": 28.645946
   },
   "composition": {
     "bpm": 74,
@@ -23,6 +26,9 @@
       "F"
     ],
     "chordBlock": "2 bars per chord",
+    "chordBlockSeconds": 6.486486,
+    "gameScheduleLeadSeconds": 0.2,
+    "chordStartIntervalSeconds": 6.286486,
     "arpPattern": [
       0,
       1,
@@ -127,127 +133,484 @@
   "melodyEvents": [
     {
       "chord": "C",
+      "cycle": 0,
       "time": 0.4054,
       "frequency": 659.25,
       "duration": 1.2162
     },
     {
       "chord": "C",
+      "cycle": 0,
       "time": 1.2162,
       "frequency": 659.25,
-      "duration": 1.2162
+      "duration": 1.6216
     },
     {
       "chord": "C",
-      "time": 2.8378,
+      "cycle": 0,
+      "time": 2.027,
+      "frequency": 783.99,
+      "duration": 1.6216
+    },
+    {
+      "chord": "C",
+      "cycle": 0,
+      "time": 3.6486,
+      "frequency": 880,
+      "duration": 1.6216
+    },
+    {
+      "chord": "C",
+      "cycle": 0,
+      "time": 4.4595,
+      "frequency": 659.25,
+      "duration": 1.2162
+    },
+    {
+      "chord": "G",
+      "cycle": 0,
+      "time": 6.6919,
+      "frequency": 783.99,
+      "duration": 1.6216
+    },
+    {
+      "chord": "G",
+      "cycle": 0,
+      "time": 7.5027,
+      "frequency": 783.99,
+      "duration": 1.2162
+    },
+    {
+      "chord": "G",
+      "cycle": 0,
+      "time": 8.3135,
+      "frequency": 493.88,
+      "duration": 1.6216
+    },
+    {
+      "chord": "G",
+      "cycle": 0,
+      "time": 9.1243,
+      "frequency": 783.99,
+      "duration": 1.2162
+    },
+    {
+      "chord": "G",
+      "cycle": 0,
+      "time": 9.9351,
+      "frequency": 659.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "G",
+      "cycle": 0,
+      "time": 10.7459,
+      "frequency": 783.99,
+      "duration": 1.6216
+    },
+    {
+      "chord": "G",
+      "cycle": 0,
+      "time": 11.5568,
+      "frequency": 493.88,
+      "duration": 1.6216
+    },
+    {
+      "chord": "Am",
+      "cycle": 0,
+      "time": 12.9784,
+      "frequency": 659.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "Am",
+      "cycle": 0,
+      "time": 13.7892,
+      "frequency": 880,
+      "duration": 1.6216
+    },
+    {
+      "chord": "Am",
+      "cycle": 0,
+      "time": 15.4108,
+      "frequency": 659.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "Am",
+      "cycle": 0,
+      "time": 16.2216,
+      "frequency": 659.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "Am",
+      "cycle": 0,
+      "time": 17.8432,
+      "frequency": 523.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "F",
+      "cycle": 0,
+      "time": 19.2649,
+      "frequency": 440,
+      "duration": 1.6216
+    },
+    {
+      "chord": "F",
+      "cycle": 0,
+      "time": 20.0757,
+      "frequency": 440,
+      "duration": 1.6216
+    },
+    {
+      "chord": "F",
+      "cycle": 0,
+      "time": 21.6973,
+      "frequency": 880,
+      "duration": 1.6216
+    },
+    {
+      "chord": "F",
+      "cycle": 0,
+      "time": 22.5081,
+      "frequency": 523.25,
+      "duration": 1.2162
+    },
+    {
+      "chord": "F",
+      "cycle": 0,
+      "time": 23.3189,
       "frequency": 880,
       "duration": 1.2162
     },
     {
+      "chord": "F",
+      "cycle": 0,
+      "time": 24.1297,
+      "frequency": 523.25,
+      "duration": 1.2162
+    },
+    {
       "chord": "C",
-      "time": 3.6486,
+      "cycle": 1,
+      "time": 25.5514,
+      "frequency": 659.25,
+      "duration": 1.2162
+    },
+    {
+      "chord": "C",
+      "cycle": 1,
+      "time": 26.3622,
       "frequency": 659.25,
       "duration": 1.6216
     },
     {
       "chord": "C",
-      "time": 5.2703,
-      "frequency": 523.25,
+      "cycle": 1,
+      "time": 27.173,
+      "frequency": 783.99,
+      "duration": 1.6216
+    },
+    {
+      "chord": "C",
+      "cycle": 1,
+      "time": 28.7946,
+      "frequency": 880,
+      "duration": 1.6216
+    },
+    {
+      "chord": "C",
+      "cycle": 1,
+      "time": 29.6054,
+      "frequency": 659.25,
       "duration": 1.2162
     },
     {
       "chord": "G",
-      "time": 6.8919,
-      "frequency": 493.88,
-      "duration": 1.2162
+      "cycle": 1,
+      "time": 31.8378,
+      "frequency": 783.99,
+      "duration": 1.6216
     },
     {
       "chord": "G",
-      "time": 7.7027,
+      "cycle": 1,
+      "time": 32.6486,
       "frequency": 783.99,
       "duration": 1.2162
     },
     {
       "chord": "G",
-      "time": 9.3243,
+      "cycle": 1,
+      "time": 33.4595,
+      "frequency": 493.88,
+      "duration": 1.6216
+    },
+    {
+      "chord": "G",
+      "cycle": 1,
+      "time": 34.2703,
       "frequency": 783.99,
       "duration": 1.2162
     },
     {
       "chord": "G",
-      "time": 10.9459,
+      "cycle": 1,
+      "time": 35.0811,
+      "frequency": 659.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "G",
+      "cycle": 1,
+      "time": 35.8919,
+      "frequency": 783.99,
+      "duration": 1.6216
+    },
+    {
+      "chord": "G",
+      "cycle": 1,
+      "time": 36.7027,
       "frequency": 493.88,
+      "duration": 1.6216
+    },
+    {
+      "chord": "Am",
+      "cycle": 1,
+      "time": 38.1243,
+      "frequency": 659.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "Am",
+      "cycle": 1,
+      "time": 38.9351,
+      "frequency": 880,
+      "duration": 1.6216
+    },
+    {
+      "chord": "Am",
+      "cycle": 1,
+      "time": 40.5568,
+      "frequency": 659.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "Am",
+      "cycle": 1,
+      "time": 41.3676,
+      "frequency": 659.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "Am",
+      "cycle": 1,
+      "time": 42.9892,
+      "frequency": 523.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "F",
+      "cycle": 1,
+      "time": 44.4108,
+      "frequency": 440,
+      "duration": 1.6216
+    },
+    {
+      "chord": "F",
+      "cycle": 1,
+      "time": 45.2216,
+      "frequency": 440,
+      "duration": 1.6216
+    },
+    {
+      "chord": "F",
+      "cycle": 1,
+      "time": 46.8432,
+      "frequency": 880,
+      "duration": 1.6216
+    },
+    {
+      "chord": "F",
+      "cycle": 1,
+      "time": 47.6541,
+      "frequency": 523.25,
+      "duration": 1.2162
+    },
+    {
+      "chord": "F",
+      "cycle": 1,
+      "time": 48.4649,
+      "frequency": 880,
+      "duration": 1.2162
+    },
+    {
+      "chord": "F",
+      "cycle": 1,
+      "time": 49.2757,
+      "frequency": 523.25,
+      "duration": 1.2162
+    },
+    {
+      "chord": "C",
+      "cycle": 2,
+      "time": 50.6973,
+      "frequency": 659.25,
+      "duration": 1.2162
+    },
+    {
+      "chord": "C",
+      "cycle": 2,
+      "time": 51.5081,
+      "frequency": 659.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "C",
+      "cycle": 2,
+      "time": 52.3189,
+      "frequency": 783.99,
+      "duration": 1.6216
+    },
+    {
+      "chord": "C",
+      "cycle": 2,
+      "time": 53.9405,
+      "frequency": 880,
+      "duration": 1.6216
+    },
+    {
+      "chord": "C",
+      "cycle": 2,
+      "time": 54.7514,
+      "frequency": 659.25,
       "duration": 1.2162
     },
     {
       "chord": "G",
-      "time": 11.7568,
-      "frequency": 587.33,
+      "cycle": 2,
+      "time": 56.9838,
+      "frequency": 783.99,
       "duration": 1.6216
     },
     {
-      "chord": "Am",
-      "time": 13.3784,
-      "frequency": 880,
-      "duration": 1.6216
-    },
-    {
-      "chord": "Am",
-      "time": 14.1892,
-      "frequency": 523.25,
+      "chord": "G",
+      "cycle": 2,
+      "time": 57.7946,
+      "frequency": 783.99,
       "duration": 1.2162
     },
     {
+      "chord": "G",
+      "cycle": 2,
+      "time": 58.6054,
+      "frequency": 493.88,
+      "duration": 1.6216
+    },
+    {
+      "chord": "G",
+      "cycle": 2,
+      "time": 59.4162,
+      "frequency": 783.99,
+      "duration": 1.2162
+    },
+    {
+      "chord": "G",
+      "cycle": 2,
+      "time": 60.227,
+      "frequency": 659.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "G",
+      "cycle": 2,
+      "time": 61.0378,
+      "frequency": 783.99,
+      "duration": 1.6216
+    },
+    {
+      "chord": "G",
+      "cycle": 2,
+      "time": 61.8486,
+      "frequency": 493.88,
+      "duration": 1.6216
+    },
+    {
       "chord": "Am",
-      "time": 15,
+      "cycle": 2,
+      "time": 63.2703,
+      "frequency": 659.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "Am",
+      "cycle": 2,
+      "time": 64.0811,
       "frequency": 880,
       "duration": 1.6216
     },
     {
       "chord": "Am",
-      "time": 16.6216,
+      "cycle": 2,
+      "time": 65.7027,
+      "frequency": 659.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "Am",
+      "cycle": 2,
+      "time": 66.5135,
+      "frequency": 659.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "Am",
+      "cycle": 2,
+      "time": 68.1351,
+      "frequency": 523.25,
+      "duration": 1.6216
+    },
+    {
+      "chord": "F",
+      "cycle": 2,
+      "time": 69.5568,
       "frequency": 440,
       "duration": 1.6216
     },
     {
-      "chord": "Am",
-      "time": 18.2432,
+      "chord": "F",
+      "cycle": 2,
+      "time": 70.3676,
       "frequency": 440,
-      "duration": 1.2162
+      "duration": 1.6216
     },
     {
       "chord": "F",
-      "time": 19.8649,
-      "frequency": 523.25,
-      "duration": 1.2162
-    },
-    {
-      "chord": "F",
-      "time": 20.6757,
+      "cycle": 2,
+      "time": 71.9892,
       "frequency": 880,
       "duration": 1.6216
     },
     {
       "chord": "F",
-      "time": 21.4865,
-      "frequency": 698.46,
-      "duration": 1.2162
-    },
-    {
-      "chord": "F",
-      "time": 22.2973,
+      "cycle": 2,
+      "time": 72.8,
       "frequency": 523.25,
       "duration": 1.2162
     },
     {
       "chord": "F",
-      "time": 23.9189,
+      "cycle": 2,
+      "time": 73.6108,
       "frequency": 880,
       "duration": 1.2162
     },
     {
       "chord": "F",
-      "time": 24.7297,
+      "cycle": 2,
+      "time": 74.4216,
       "frequency": 523.25,
       "duration": 1.2162
     }
@@ -257,7 +620,7 @@
     "dryGain": 0.5,
     "wetGain": 0.5,
     "normalizedPeak": 0.78,
-    "preNormalizePeak": 0.02834624,
-    "assetGain": 27.5168747
+    "preNormalizePeak": 0.0288737,
+    "assetGain": 27.01420612
   }
 }

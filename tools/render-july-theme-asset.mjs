@@ -14,12 +14,15 @@ try {
 const OUT_DIR = path.resolve('assets/audio');
 const WAV_PATH = path.join(OUT_DIR, 'july.wav');
 const MP3_PATH = path.join(OUT_DIR, 'july.mp3');
+const TAIL_WAV_PATH = path.join(OUT_DIR, 'july-with-tail.wav');
+const TAIL_MP3_PATH = path.join(OUT_DIR, 'july-with-tail.mp3');
 const RECIPE_PATH = path.join(OUT_DIR, 'july.recipe.json');
 const NOTES_PATH = path.join(OUT_DIR, 'july.notes.txt');
 
 const renderResult = await renderJulyInBrowser();
 await mkdir(OUT_DIR, { recursive: true });
-await writeFile(WAV_PATH, Buffer.from(renderResult.wavBase64, 'base64'));
+await writeFile(WAV_PATH, Buffer.from(renderResult.loopWavBase64, 'base64'));
+await writeFile(TAIL_WAV_PATH, Buffer.from(renderResult.tailWavBase64, 'base64'));
 await writeFile(RECIPE_PATH, JSON.stringify(renderResult.recipe, null, 2) + '\n');
 await writeFile(NOTES_PATH, [
   'July',
@@ -28,12 +31,14 @@ await writeFile(NOTES_PATH, [
   'Preserve the founder-approved original Tic-Tac-Toe background music as a reusable project asset.',
   '',
   'Files:',
-  '- july.wav: archival 16-bit stereo WAV.',
-  '- july.mp3: portable 192 kbps MP3.',
+  '- july.wav: exact game-cycle loop, archival 16-bit stereo WAV.',
+  '- july.mp3: exact game-cycle loop, portable 192 kbps MP3.',
+  '- july-with-tail.wav: one July cycle plus reverb tail for standalone playback.',
+  '- july-with-tail.mp3: portable tail render.',
   '- july.recipe.json: source recipe, July metadata, chord pools, melody events, and render details.',
   '',
   'Source:',
-  'Rendered with the browser WebAudio API from the Tic-Tac-Toe music design in index.html: 74 BPM, C-G-Am-F, two bars per chord, harp-like plucks, soft bass pad, and the approved TTT melody behavior.',
+  'Rendered with the browser WebAudio API from the Tic-Tac-Toe music design in index.html: 74 BPM, C-G-Am-F, two bars per chord, harp-like plucks, soft bass pad, and the approved TTT melody behavior. The game schedules each chord block 200ms before the prior block nominally ends; the loop files preserve that timing.',
   '',
   'Important:',
   'Do not delete or replace these files casually. This is an early One Day Games / Tic-Tac-Toe creative artifact that CJ directed, approved, and named July.',
@@ -58,8 +63,28 @@ if (ffmpeg.status !== 0) {
   throw new Error('ffmpeg failed while creating july.mp3');
 }
 
+const tailFfmpeg = spawnSync('ffmpeg', [
+  '-y',
+  '-hide_banner',
+  '-loglevel',
+  'error',
+  '-i',
+  TAIL_WAV_PATH,
+  '-codec:a',
+  'libmp3lame',
+  '-b:a',
+  '192k',
+  TAIL_MP3_PATH,
+], { stdio: 'inherit' });
+
+if (tailFfmpeg.status !== 0) {
+  throw new Error('ffmpeg failed while creating july-with-tail.mp3');
+}
+
 console.log(`Wrote ${WAV_PATH}`);
 console.log(`Wrote ${MP3_PATH}`);
+console.log(`Wrote ${TAIL_WAV_PATH}`);
+console.log(`Wrote ${TAIL_MP3_PATH}`);
 console.log(`Wrote ${RECIPE_PATH}`);
 console.log(`Wrote ${NOTES_PATH}`);
 
@@ -75,9 +100,12 @@ async function renderJulyInBrowser() {
     const BEAT = 60 / BPM;
     const BAR = BEAT * 4;
     const CHORD_BLOCK_SECONDS = BAR * 2;
-    const PROGRESSION_SECONDS = CHORD_BLOCK_SECONDS * 4;
+    const GAME_SCHEDULE_LEAD_SECONDS = 0.2;
+    const CHORD_START_INTERVAL_SECONDS = CHORD_BLOCK_SECONDS - GAME_SCHEDULE_LEAD_SECONDS;
+    const LOOP_SECONDS = CHORD_START_INTERVAL_SECONDS * 4;
     const REVERB_TAIL_SECONDS = 3.5;
-    const DURATION_SECONDS = PROGRESSION_SECONDS + REVERB_TAIL_SECONDS;
+    const RENDER_CYCLES = 3;
+    const RENDER_SECONDS = LOOP_SECONDS * RENDER_CYCLES + REVERB_TAIL_SECONDS;
     const OfflineCtx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
 
     if (!OfflineCtx) {
@@ -113,15 +141,15 @@ async function renderJulyInBrowser() {
       };
     }
 
-    const random = mulberry32(xmur3(TAKE_ID)());
-    const ctx = new OfflineCtx(2, Math.ceil(DURATION_SECONDS * SAMPLE_RATE), SAMPLE_RATE);
+    const ctx = new OfflineCtx(2, Math.ceil(RENDER_SECONDS * SAMPLE_RATE), SAMPLE_RATE);
     const rev = ctx.createConvolver();
     const impulseLength = SAMPLE_RATE * 3.5;
     const impulse = ctx.createBuffer(2, impulseLength, SAMPLE_RATE);
+    const reverbRandom = mulberry32(xmur3(TAKE_ID + ':reverb')());
     for (let c = 0; c < 2; c++) {
       const data = impulse.getChannelData(c);
       for (let i = 0; i < impulseLength; i++) {
-        data[i] = (random() * 2 - 1) * Math.pow(1 - i / impulseLength, 2.4);
+        data[i] = (reverbRandom() * 2 - 1) * Math.pow(1 - i / impulseLength, 2.4);
       }
     }
     rev.buffer = impulse;
@@ -140,6 +168,22 @@ async function renderJulyInBrowser() {
     dry.connect(master);
 
     const melodyEvents = [];
+    const blockMelodyPlans = CHORDS.map((chord, chordIndex) => {
+      const melodyRandom = mulberry32(xmur3(`${TAKE_ID}:melody:${chord.name}:${chordIndex}`)());
+      const events = [];
+      let mt = BEAT * 0.5;
+      while (mt < BAR * 2 - BEAT) {
+        const frequency = chord.m[Math.floor(melodyRandom() * chord.m.length)];
+        const dur = BEAT * (melodyRandom() > 0.5 ? 2 : 1.5);
+        events.push({
+          offset: mt,
+          frequency,
+          duration: dur,
+        });
+        mt += BEAT * (1 + Math.floor(melodyRandom() * 2));
+      }
+      return events;
+    });
 
     function pluck(freq, when, dur, vol, dest) {
       [1, 2].forEach((mult, i) => {
@@ -174,7 +218,7 @@ async function renderJulyInBrowser() {
       osc.stop(when + dur + 0.1);
     }
 
-    function scheduleChord(chord, startTime) {
+    function scheduleChord(chord, startTime, chordIndex, cycleIndex) {
       const { b, a, m } = chord;
       const bars = 2;
       const beats = bars * 4;
@@ -193,41 +237,55 @@ async function renderJulyInBrowser() {
         pluck(note, t, BEAT * 2.0, vol * 0.4, rev);
       }
 
-      let mt = startTime + BEAT * 0.5;
-      while (mt < startTime + BAR * bars - BEAT) {
-        const frequency = m[Math.floor(random() * m.length)];
-        const dur = BEAT * (random() > 0.5 ? 2 : 1.5);
+      for (const event of blockMelodyPlans[chordIndex]) {
+        const mt = startTime + event.offset;
+        const frequency = event.frequency;
+        const dur = event.duration;
         melodyEvents.push({
           chord: chord.name,
+          cycle: cycleIndex,
           time: Number(mt.toFixed(4)),
           frequency,
           duration: Number(dur.toFixed(4)),
         });
         pluck(frequency, mt, dur + 0.6, 0.09, dry);
         pluck(frequency, mt, dur + 1.2, 0.06, rev);
-        mt += BEAT * (1 + Math.floor(random() * 2));
       }
     }
 
-    CHORDS.forEach((chord, index) => scheduleChord(chord, index * CHORD_BLOCK_SECONDS));
+    for (let cycle = 0; cycle < RENDER_CYCLES; cycle++) {
+      CHORDS.forEach((chord, index) => {
+        scheduleChord(chord, cycle * LOOP_SECONDS + index * CHORD_START_INTERVAL_SECONDS, index, cycle);
+      });
+    }
+
     const buffer = await ctx.startRendering();
-    const peak = findPeak(buffer);
+    const loopStartSeconds = LOOP_SECONDS;
+    const loopEndSeconds = LOOP_SECONDS * 2;
+    const tailStartSeconds = LOOP_SECONDS;
+    const tailEndSeconds = LOOP_SECONDS * 2 + REVERB_TAIL_SECONDS;
+    const peak = findPeak(buffer, loopStartSeconds, loopEndSeconds);
     const normalizedPeak = 0.78;
     const assetGain = peak > 0 ? normalizedPeak / peak : 1;
-    const wav = encodeWav(buffer, assetGain);
+    const loopWav = encodeWav(buffer, assetGain, loopStartSeconds, loopEndSeconds);
+    const tailWav = encodeWav(buffer, assetGain, tailStartSeconds, tailEndSeconds);
 
-    function findPeak(audioBuffer) {
+    function findPeak(audioBuffer, startSeconds, endSeconds) {
       let peak = 0;
+      const start = Math.max(0, Math.floor(startSeconds * audioBuffer.sampleRate));
+      const end = Math.min(audioBuffer.length, Math.ceil(endSeconds * audioBuffer.sampleRate));
       for (let ch = 0; ch < audioBuffer.numberOfChannels; ch++) {
         const data = audioBuffer.getChannelData(ch);
-        for (let i = 0; i < data.length; i++) peak = Math.max(peak, Math.abs(data[i]));
+        for (let i = start; i < end; i++) peak = Math.max(peak, Math.abs(data[i]));
       }
       return peak;
     }
 
-    function encodeWav(audioBuffer, gain) {
+    function encodeWav(audioBuffer, gain, startSeconds, endSeconds) {
       const channels = audioBuffer.numberOfChannels;
-      const samples = audioBuffer.length;
+      const start = Math.max(0, Math.floor(startSeconds * audioBuffer.sampleRate));
+      const end = Math.min(audioBuffer.length, Math.ceil(endSeconds * audioBuffer.sampleRate));
+      const samples = end - start;
       const bytesPerSample = 2;
       const blockAlign = channels * bytesPerSample;
       const dataSize = samples * blockAlign;
@@ -255,8 +313,9 @@ async function renderJulyInBrowser() {
 
       const channelData = Array.from({ length: channels }, (_, ch) => audioBuffer.getChannelData(ch));
       for (let i = 0; i < samples; i++) {
+        const sourceIndex = start + i;
         for (let ch = 0; ch < channels; ch++) {
-          const x = Math.max(-1, Math.min(1, channelData[ch][i] * gain));
+          const x = Math.max(-1, Math.min(1, channelData[ch][sourceIndex] * gain));
           view.setInt16(offset, x < 0 ? x * 0x8000 : x * 0x7fff, true);
           offset += 2;
         }
@@ -275,7 +334,8 @@ async function renderJulyInBrowser() {
     }
 
     return {
-      wavBase64: arrayBufferToBase64(wav),
+      loopWavBase64: arrayBufferToBase64(loopWav),
+      tailWavBase64: arrayBufferToBase64(tailWav),
       recipe: {
         title: TITLE,
         role: 'Founder-approved original Tic-Tac-Toe background music preservation asset.',
@@ -287,15 +347,21 @@ async function renderJulyInBrowser() {
         format: {
           wav: 'assets/audio/july.wav',
           mp3: 'assets/audio/july.mp3',
+          wavWithTail: 'assets/audio/july-with-tail.wav',
+          mp3WithTail: 'assets/audio/july-with-tail.mp3',
           sampleRate: SAMPLE_RATE,
           channels: 2,
           bitDepth: 16,
-          durationSeconds: Number(DURATION_SECONDS.toFixed(6)),
+          loopDurationSeconds: Number(LOOP_SECONDS.toFixed(6)),
+          withTailDurationSeconds: Number((LOOP_SECONDS + REVERB_TAIL_SECONDS).toFixed(6)),
         },
         composition: {
           bpm: BPM,
           progression: CHORDS.map(chord => chord.name),
           chordBlock: '2 bars per chord',
+          chordBlockSeconds: Number(CHORD_BLOCK_SECONDS.toFixed(6)),
+          gameScheduleLeadSeconds: GAME_SCHEDULE_LEAD_SECONDS,
+          chordStartIntervalSeconds: Number(CHORD_START_INTERVAL_SECONDS.toFixed(6)),
           arpPattern: [0,1,2,3,2,1,0,2,1,3,2,1,0,2,1,3],
           arpRate: '8th notes',
           instruments: ['sine pluck fundamental', 'soft octave overtone', 'triangle bass pad', 'browser convolver reverb'],
