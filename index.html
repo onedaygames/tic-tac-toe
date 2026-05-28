@@ -670,9 +670,33 @@
       color: rgba(255,255,255,0.86);
       text-shadow: 0 2px 10px rgba(0,0,0,0.48);
     }
+    @media (min-width: 501px) {
+      .board-overlay.replay .play-prompt {
+        gap: 2px;
+        animation: replayPulse 0.95s ease-in-out infinite;
+      }
+      .board-overlay.replay .play-arrow {
+        font-size: 2.05rem;
+        margin-bottom: -2px;
+      }
+      .board-overlay.replay .play-label {
+        max-width: 92%;
+        font-size: clamp(2.65rem, 8.4vh, 3.1rem);
+        line-height: 0.94;
+        letter-spacing: 0.035em;
+        text-align: center;
+      }
+      .board-overlay.replay .play-subtitle {
+        margin-top: 3px;
+      }
+    }
     @keyframes playPulse {
       0%,100% { transform: scale(1);    filter: brightness(1);    }
       50%     { transform: scale(1.15); filter: brightness(1.22); }
+    }
+    @keyframes replayPulse {
+      0%,100% { transform: scale(1);    filter: brightness(1);    }
+      50%     { transform: scale(1.07); filter: brightness(1.16); }
     }
 
     /* Sun win-burst rings */
@@ -915,7 +939,7 @@
       .score-box { padding: 4px 12px; border-radius: 12px; }
       .score-value { font-size: 1.2rem; }
       .status    { font-size: 0.88rem; padding: 5px 14px; min-width: 140px; }
-      .container { gap: clamp(4px, 1.2vh, 9px); }
+      .container { gap: clamp(4px, 1.2vh, 9px); transform: translateY(-20px); }
       /* Enlarge overlay play prompt for fat fingers */
       .play-label { font-size: 2.8rem; }
       .play-arrow { font-size: 2rem; }
@@ -991,7 +1015,7 @@
 </div>
 <!-- ── End mobile splash ──────────────────────────────────────────────────── -->
 
-<div id="build-stamp"></div>
+<div id="build-stamp">DEV · 2026-05-27-1753</div>
 <button id="world-toggle" type="button" aria-label="Toggle day or night review mode">Toggle Day</button>
 <div class="night-sky" aria-hidden="true"></div>
 <div class="stars" aria-hidden="true"></div>
@@ -1388,6 +1412,7 @@
   let worldPhase = 'day';
   let roundsSinceWorldShift = 0;
   let worldCycleTimer = null;
+  let worldLastShiftAt = Date.now();
   let shootingStarTimer = null;
 
   function isNightMode() {
@@ -1396,16 +1421,17 @@
 
   function setWorldPhase(phase, reason = 'cycle') {
     const nextPhase = phase === 'night' ? 'night' : 'day';
-    if (worldPhase === nextPhase && document.body.classList.contains('night-mode') === (nextPhase === 'night')) return;
+    const alreadyInPhase = worldPhase === nextPhase && document.body.classList.contains('night-mode') === (nextPhase === 'night');
     worldPhase = nextPhase;
     roundsSinceWorldShift = 0;
+    worldLastShiftAt = Date.now();
     document.body.classList.toggle('night-mode', worldPhase === 'night');
     if (themeColorMeta) themeColorMeta.setAttribute('content', worldPhase === 'night' ? '#101a42' : '#5bc8f5');
     if (worldToggle) {
       worldToggle.textContent = worldPhase === 'night' ? 'Toggle Day' : 'Toggle Night';
       worldToggle.setAttribute('aria-label', worldPhase === 'night' ? 'Switch review build to day' : 'Switch review build to night');
     }
-    track('world_phase', { phase: worldPhase, reason });
+    if (!alreadyInPhase) track('world_phase', { phase: worldPhase, reason });
     scheduleWorldCycle();
   }
 
@@ -1413,16 +1439,39 @@
     setWorldPhase(isNightMode() ? 'day' : 'night', reason);
   }
 
+  function syncWorldCycle(reason = 'sync') {
+    const elapsed = Date.now() - worldLastShiftAt;
+    if (elapsed < DAY_NIGHT_MS) {
+      scheduleWorldCycle();
+      return;
+    }
+    const shiftsDue = Math.max(1, Math.floor(elapsed / DAY_NIGHT_MS));
+    if (shiftsDue % 2 === 1) {
+      toggleWorldPhase(reason);
+    } else {
+      worldLastShiftAt = Date.now();
+      scheduleWorldCycle();
+    }
+  }
+
   function scheduleWorldCycle() {
     clearTimeout(worldCycleTimer);
-    worldCycleTimer = setTimeout(() => toggleWorldPhase('timer'), DAY_NIGHT_MS);
+    const delay = Math.max(1000, DAY_NIGHT_MS - (Date.now() - worldLastShiftAt));
+    worldCycleTimer = setTimeout(() => syncWorldCycle('timer'), delay);
   }
 
   if (worldToggle) {
     worldToggle.addEventListener('click', () => toggleWorldPhase('review-toggle'));
   }
 
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) syncWorldCycle('visibility');
+  });
+  window.addEventListener('pageshow', () => syncWorldCycle('pageshow'));
+  window.addEventListener('focus', () => syncWorldCycle('focus'));
+
   function noteRoundForWorldCycle() {
+    syncWorldCycle('round-sync');
     if (!DAY_NIGHT_ROUNDS) return;
     roundsSinceWorldShift++;
     if (roundsSinceWorldShift >= DAY_NIGHT_ROUNDS) toggleWorldPhase('rounds');
@@ -1552,9 +1601,10 @@
     requestAnimationFrame(tick);
   }
 
-  function showAttract(label = 'Play!', subtitle = '') {
+  function showAttract(label = 'Play!', subtitle = '', mode = 'start') {
     playLabel.textContent = label;
     playSubtitle.textContent = subtitle;
+    boardOverlay.classList.toggle('replay', mode === 'replay');
     boardOverlay.classList.add('visible');
     boardWrap.classList.add('attract');
     // Gently burst the title while attract screen is showing
@@ -1984,7 +2034,8 @@
       const session = gameSession;
       setTimeout(() => { if (p0Mode && session === gameSession) { initGame(); setTimeout(p0XTurn, 800); } }, 3200);
     } else {
-      setTimeout(() => showAttract(replayLabel, replaySubtitle), 1300);
+      const replayDelay = _isMobile ? 1300 : 650;
+      setTimeout(() => showAttract(replayLabel, replaySubtitle, 'replay'), replayDelay);
     }
   }
 
@@ -2048,6 +2099,7 @@
 
   cells.forEach(cell => {
     cell.addEventListener('click', () => {
+      syncWorldCycle('player-sync');
       const idx = +cell.dataset.i;
       if (p0Mode) resumeFromP0ForPlayer();
       if (gameOver || boardOverlay.classList.contains('visible') || board[idx] || current !== 'X' || cpuThinking) return;
@@ -2062,7 +2114,7 @@
     });
   });
 
-  boardOverlay.addEventListener('click', () => { _unlockAudio(); initGame(); track('game_start'); });
+  boardOverlay.addEventListener('click', () => { syncWorldCycle('play-sync'); _unlockAudio(); initGame(); track('game_start'); });
   initGame();
   showAttract();
   setWorldPhase(cycleParams.has('day') ? 'day' : 'night', cycleParams.has('day') ? 'query' : 'load');
