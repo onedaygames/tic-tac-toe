@@ -1133,7 +1133,13 @@
         height: clamp(74px, 23vw, 98px);
       }
       .board     { gap: 6px; }
-      .board-wrap{ margin-top: 7px; padding: 9px; border-radius: 19px; }
+      .board-wrap {
+        --mobile-board-reach-offset: clamp(28px, 6.4svh, 46px);
+        margin-top: 7px;
+        padding: 9px;
+        border-radius: 19px;
+        transform: translateY(var(--mobile-board-reach-offset));
+      }
       .scores    { gap: 8px; }
       .score-box { padding: 4px 10px; border-radius: 12px; }
       .score-value { font-size: 1.12rem; }
@@ -1229,7 +1235,7 @@
 </div>
 <!-- ── End mobile splash ──────────────────────────────────────────────────── -->
 
-<div id="build-stamp">DEV · 2026-05-27-2051</div>
+<div id="build-stamp">DEV · 2026-05-27-2259</div>
 <button id="world-toggle" type="button" aria-label="Toggle day or night review mode">Toggle Day</button>
 <div class="night-sky" aria-hidden="true"></div>
 <div class="stars" aria-hidden="true"></div>
