@@ -115,7 +115,9 @@
     }
   </style>
   <script>
-    if (/Mobi|Android|iPhone|iPad|iPod|Touch/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 900)) {
+    const mobileSplashParams = new URLSearchParams(location.search);
+    const skipMobileSplash = mobileSplashParams.has('skipSplash') || mobileSplashParams.has('qaFanfare');
+    if (!skipMobileSplash && (/Mobi|Android|iPhone|iPad|iPod|Touch/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 900))) {
       document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('mobile-splash').style.display = 'block';
         document.body.style.overflow = 'hidden';
@@ -867,6 +869,196 @@
       100% { opacity: 0; transform: translate(-50%, -56%) scale(1.03); }
     }
 
+    .fanfare-layer {
+      --fanfare-duration: 2600ms;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      pointer-events: none;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      box-sizing: border-box;
+      padding: clamp(72px, 16vh, 136px) 14px max(110px, 22vh);
+      opacity: 0;
+      animation: fanfareLayer var(--fanfare-duration) ease-out forwards;
+    }
+    .fanfare-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr;
+      align-items: center;
+      justify-items: center;
+      gap: 8px;
+      width: min(92vw, 600px);
+      min-height: 118px;
+      padding: 18px 24px 20px;
+      box-sizing: border-box;
+      border-radius: 24px;
+      overflow: hidden;
+      text-align: center;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,210,0.92) 38%, rgba(219,234,254,0.92) 100%);
+      border: 2px solid rgba(255,255,255,0.96);
+      box-shadow:
+        0 16px 36px rgba(15,23,42,0.26),
+        0 0 0 7px rgba(255,255,255,0.22),
+        0 0 46px rgba(250,204,21,0.34);
+      transform-origin: 50% 50%;
+      animation: fanfareCardPop var(--fanfare-duration) ease-out forwards;
+    }
+    .fanfare-card::before {
+      content: "";
+      position: absolute;
+      inset: -35%;
+      background:
+        conic-gradient(from 0deg,
+          rgba(249,115,22,0.22),
+          rgba(59,130,246,0.20),
+          rgba(34,197,94,0.22),
+          rgba(244,114,182,0.20),
+          rgba(249,115,22,0.22)
+        );
+      animation: fanfareSweep 1.45s linear infinite;
+    }
+    .fanfare-card::after {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.72);
+      box-shadow: inset 0 0 28px rgba(255,255,255,0.34);
+    }
+    .fanfare-card.has-prize {
+      grid-template-columns: minmax(82px, 118px) minmax(0, 1fr);
+      justify-items: start;
+      text-align: left;
+      gap: 15px;
+      width: min(92vw, 650px);
+    }
+    .fanfare-prize {
+      position: relative;
+      z-index: 1;
+      width: clamp(82px, 16vw, 118px);
+      height: clamp(82px, 16vw, 118px);
+      filter: drop-shadow(0 9px 13px rgba(88,40,8,0.24));
+      animation: fanfarePrizeFloat 0.72s ease-in-out infinite alternate;
+    }
+    .fanfare-copy {
+      position: relative;
+      z-index: 1;
+      min-width: 0;
+    }
+    .fanfare-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: clamp(2rem, 7vw, 4.6rem);
+      line-height: 0.94;
+      letter-spacing: 0;
+      color: #111827;
+      text-wrap: balance;
+      text-shadow:
+        0 3px 0 rgba(255,255,255,0.88),
+        0 7px 18px rgba(15,23,42,0.18);
+    }
+    .fanfare-subtitle {
+      margin-top: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      line-height: 1.2;
+      text-transform: uppercase;
+      color: rgba(31,41,55,0.82);
+      text-wrap: balance;
+    }
+    .fanfare-layer.quick .fanfare-title { color: #2563eb; }
+    .fanfare-layer.streak .fanfare-title { color: #c2410c; }
+    .fanfare-layer.prize .fanfare-title { color: #a16207; }
+    .fanfare-spark {
+      position: fixed;
+      left: var(--x);
+      top: var(--y);
+      z-index: 1001;
+      width: var(--s);
+      height: var(--s);
+      border-radius: 999px;
+      background: var(--c);
+      box-shadow: 0 0 18px var(--c);
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.42);
+      animation: fanfareSpark var(--fanfare-duration) ease-out forwards;
+    }
+    .fanfare-spark::after {
+      content: "";
+      position: absolute;
+      inset: 22%;
+      border-radius: 0;
+      background: #fff;
+      transform: rotate(45deg);
+      opacity: 0.82;
+    }
+
+    @keyframes fanfareLayer {
+      0%   { opacity: 0; transform: translateY(10px); }
+      10%  { opacity: 1; transform: translateY(0); }
+      78%  { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-18px); }
+    }
+    @keyframes fanfareCardPop {
+      0%   { transform: scale(0.76) rotate(-2deg); filter: brightness(1.25); }
+      12%  { transform: scale(1.08) rotate(1deg);  filter: brightness(1.10); }
+      24%  { transform: scale(0.98) rotate(0deg);  filter: brightness(1); }
+      78%  { transform: scale(1) rotate(0deg);     filter: brightness(1); }
+      100% { transform: scale(1.03) rotate(0deg);  filter: brightness(1.04); }
+    }
+    @keyframes fanfareSweep {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes fanfarePrizeFloat {
+      from { transform: translateY(0) rotate(-1deg) scale(1); }
+      to   { transform: translateY(-5px) rotate(1deg) scale(1.03); }
+    }
+    @keyframes fanfareSpark {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.34); }
+      12%  { opacity: 1; }
+      42%  { opacity: 0.95; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1); }
+      100% { opacity: 0; transform: translate(calc(-50% + var(--dx2)), calc(-50% + var(--dy2))) scale(0.18); }
+    }
+
+    @media (max-width: 500px) {
+      .fanfare-layer {
+        padding: clamp(66px, 14svh, 94px) 10px max(96px, 20svh);
+      }
+      .fanfare-card {
+        width: min(94vw, 420px);
+        min-height: 102px;
+        padding: 14px 15px 16px;
+        border-radius: 19px;
+      }
+      .fanfare-card::after {
+        inset: 6px;
+        border-radius: 14px;
+      }
+      .fanfare-card.has-prize {
+        grid-template-columns: 84px minmax(0, 1fr);
+        gap: 10px;
+      }
+      .fanfare-prize {
+        width: 82px;
+        height: 82px;
+      }
+      .fanfare-title {
+        font-size: clamp(1.55rem, 7.8vw, 2.35rem);
+        line-height: 0.92;
+      }
+      .fanfare-subtitle {
+        margin-top: 6px;
+        font-size: 0.62rem;
+        letter-spacing: 0.11em;
+      }
+    }
+
     /* Ensure the viewport never scrolls in any embed context */
     html { height: 100%; overflow: hidden; }
 
@@ -1037,7 +1229,7 @@
 </div>
 <!-- ── End mobile splash ──────────────────────────────────────────────────── -->
 
-<div id="build-stamp">DEV · 2026-05-27-1846</div>
+<div id="build-stamp">DEV · 2026-05-27-2051</div>
 <button id="world-toggle" type="button" aria-label="Toggle day or night review mode">Toggle Day</button>
 <div class="night-sky" aria-hidden="true"></div>
 <div class="stars" aria-hidden="true"></div>
@@ -1410,6 +1602,10 @@
   let board, current, gameOver, scores = { X: 0, O: 0, D: 0 };
   let cpuThinking = false;
   let gameSession = 0;
+  let playerMovesThisRound = 0;
+  let playerWinStreak = 0;
+  let totalPlayerWins = 0;
+  let fanfareTimer = null;
 
   const cells        = [...document.querySelectorAll('.cell')];
   const statusEl     = document.getElementById('status');
@@ -1424,6 +1620,21 @@
   const worldToggle = document.getElementById('world-toggle');
 
   let _attractBurstTimer = null;
+
+  const SPECIAL_PRIZES = [
+    { name: 'Cherry Pair', kind: 'cherries', main: '#dc2626', accent: '#ef4444', leaf: '#16a34a' },
+    { name: 'Strawberry', kind: 'strawberry', main: '#e11d48', accent: '#fbbf24', leaf: '#22c55e' },
+    { name: 'Orange Slice', kind: 'orange', main: '#f97316', accent: '#fed7aa', leaf: '#16a34a' },
+    { name: 'Watermelon', kind: 'melon', main: '#16a34a', accent: '#f43f5e', leaf: '#14532d' },
+    { name: 'Apple', kind: 'apple', main: '#dc2626', accent: '#fecaca', leaf: '#22c55e' },
+    { name: 'Lemon', kind: 'lemon', main: '#facc15', accent: '#fef08a', leaf: '#84cc16' },
+    { name: 'Plum', kind: 'plum', main: '#7c3aed', accent: '#c4b5fd', leaf: '#22c55e' },
+    { name: 'Peach', kind: 'peach', main: '#fb923c', accent: '#fed7aa', leaf: '#22c55e' },
+    { name: 'Starfruit', kind: 'starfruit', main: '#facc15', accent: '#fde68a', leaf: '#84cc16' },
+    { name: 'Dragon Fruit', kind: 'dragonfruit', main: '#ec4899', accent: '#fef2f2', leaf: '#22c55e' },
+    { name: 'Blueberry Cluster', kind: 'blueberries', main: '#2563eb', accent: '#bfdbfe', leaf: '#16a34a' },
+    { name: 'Golden Pear', kind: 'pear', main: '#f59e0b', accent: '#fde68a', leaf: '#65a30d' },
+  ];
 
   const cycleParams = new URLSearchParams(location.search);
   const DAY_NIGHT_ROUNDS = Math.max(0, parseInt(cycleParams.get('cycleRounds') || '0', 10));
@@ -1649,6 +1860,223 @@
     if (typeof umami !== 'undefined') umami.track(event, data);
   }
 
+  function resetFanfareProgress() {
+    playerMovesThisRound = 0;
+    playerWinStreak = 0;
+    totalPlayerWins = 0;
+  }
+
+  function prizeForMilestone(totalWins) {
+    const milestone = Math.max(1, Math.floor(totalWins / 12));
+    const prizeIndex = (milestone - 1) % SPECIAL_PRIZES.length;
+    const lap = Math.floor((milestone - 1) / SPECIAL_PRIZES.length) + 1;
+    return { ...SPECIAL_PRIZES[prizeIndex], milestone, lap };
+  }
+
+  function makeDozenFanfare(totalWins) {
+    const prize = prizeForMilestone(totalWins);
+    return {
+      kind: 'prize',
+      title: totalWins === 12 ? "THAT'S 12 WINS!" : "THAT'S 12 MORE WINS!",
+      subtitle: `Arcade prize: ${prize.name}`,
+      replaySubtitle: 'Prize won',
+      duration: 3300,
+      prize,
+    };
+  }
+
+  function chooseSpecialFanfare(totalWins, streak, playerMoves) {
+    if (totalWins > 0 && totalWins % 12 === 0) return makeDozenFanfare(totalWins);
+    if (streak === 3) {
+      return {
+        kind: 'streak',
+        title: '3 WINS IN A ROW!',
+        subtitle: 'Win streak',
+        replaySubtitle: '3 win streak',
+        duration: 2850,
+      };
+    }
+    if (playerMoves === 3) {
+      return {
+        kind: 'quick',
+        title: 'Quick Win!',
+        subtitle: 'Won in only 3 moves',
+        replaySubtitle: 'Quick Win!',
+        duration: 2450,
+      };
+    }
+    return null;
+  }
+
+  function recordPlayerWinAndPickFanfare() {
+    totalPlayerWins++;
+    playerWinStreak++;
+    const event = chooseSpecialFanfare(totalPlayerWins, playerWinStreak, playerMovesThisRound);
+    if (event) {
+      track('special_fanfare', {
+        kind: event.kind,
+        totalWins: totalPlayerWins,
+        streak: playerWinStreak,
+        playerMoves: playerMovesThisRound,
+      });
+    }
+    return event;
+  }
+
+  function renderPrizeSvg(prize) {
+    const base = `<svg class="fanfare-prize-svg" viewBox="0 0 120 120" role="img" aria-label="${prize.name}" xmlns="http://www.w3.org/2000/svg">`;
+    const shine = `<circle cx="42" cy="36" r="8" fill="rgba(255,255,255,0.55)"/>`;
+    const shadow = `<ellipse cx="60" cy="104" rx="34" ry="8" fill="rgba(92,50,12,0.24)"/>`;
+    const stem = `<path d="M60 29 C64 17 73 12 82 10" fill="none" stroke="#7c2d12" stroke-width="5" stroke-linecap="round"/>`;
+    const leaf = `<ellipse cx="82" cy="18" rx="14" ry="7" fill="${prize.leaf}" transform="rotate(-22 82 18)"/>`;
+
+    switch (prize.kind) {
+      case 'cherries':
+        return `${base}${shadow}<path d="M48 52 C48 30 58 17 70 11" fill="none" stroke="#7c2d12" stroke-width="4" stroke-linecap="round"/><path d="M76 55 C75 32 76 19 70 11" fill="none" stroke="#7c2d12" stroke-width="4" stroke-linecap="round"/>${leaf}<circle cx="44" cy="67" r="23" fill="${prize.main}"/><circle cx="77" cy="70" r="23" fill="${prize.accent}"/>${shine}<circle cx="70" cy="56" r="6" fill="rgba(255,255,255,0.45)"/></svg>`;
+      case 'strawberry':
+        return `${base}${shadow}<path d="M60 27 C89 27 98 54 82 82 C72 98 48 98 38 82 C22 54 31 27 60 27Z" fill="${prize.main}"/>${shine}<g fill="${prize.accent}"><circle cx="49" cy="51" r="2.7"/><circle cx="66" cy="48" r="2.7"/><circle cx="78" cy="63" r="2.7"/><circle cx="43" cy="69" r="2.7"/><circle cx="61" cy="75" r="2.7"/></g><path d="M43 28 L54 17 L61 29 L72 17 L77 31 Z" fill="${prize.leaf}"/></svg>`;
+      case 'orange':
+        return `${base}${shadow}<circle cx="60" cy="62" r="36" fill="${prize.main}"/><circle cx="60" cy="62" r="27" fill="${prize.accent}" opacity="0.78"/><path d="M60 35 V89 M36 62 H84 M42 44 L78 80 M78 44 L42 80" stroke="#fb923c" stroke-width="4" stroke-linecap="round" opacity="0.78"/>${stem}${leaf}</svg>`;
+      case 'melon':
+        return `${base}${shadow}<path d="M24 72 C38 33 82 33 96 72 C80 98 40 98 24 72Z" fill="${prize.main}"/><path d="M34 70 C46 48 74 48 86 70 C75 87 45 87 34 70Z" fill="${prize.accent}"/><g fill="#111827" opacity="0.75"><circle cx="51" cy="69" r="2.5"/><circle cx="62" cy="75" r="2.5"/><circle cx="72" cy="68" r="2.5"/></g></svg>`;
+      case 'apple':
+        return `${base}${shadow}${stem}${leaf}<path d="M60 44 C70 31 96 40 94 67 C92 94 70 103 60 91 C50 103 28 94 26 67 C24 40 50 31 60 44Z" fill="${prize.main}"/>${shine}</svg>`;
+      case 'lemon':
+        return `${base}${shadow}<path d="M27 64 C38 32 82 22 96 43 C83 78 42 97 27 64Z" fill="${prize.main}"/><path d="M41 62 C50 44 76 36 86 47 C76 67 52 78 41 62Z" fill="${prize.accent}" opacity="0.65"/>${stem}${leaf}</svg>`;
+      case 'plum':
+        return `${base}${shadow}${stem}${leaf}<circle cx="61" cy="66" r="36" fill="${prize.main}"/><path d="M60 35 C67 53 67 76 58 96" fill="none" stroke="${prize.accent}" stroke-width="4" stroke-linecap="round" opacity="0.58"/>${shine}</svg>`;
+      case 'peach':
+        return `${base}${shadow}${stem}${leaf}<path d="M60 36 C84 28 98 50 88 76 C80 97 61 101 54 86 C42 99 21 85 28 59 C33 40 47 32 60 36Z" fill="${prize.main}"/><path d="M61 39 C68 57 65 79 54 91" fill="none" stroke="${prize.accent}" stroke-width="5" stroke-linecap="round" opacity="0.62"/>${shine}</svg>`;
+      case 'starfruit':
+        return `${base}${shadow}<path d="M60 21 L70 48 L99 48 L75 65 L84 94 L60 76 L36 94 L45 65 L21 48 L50 48 Z" fill="${prize.main}"/><path d="M60 35 L66 53 L84 53 L69 64 L75 82 L60 70 L45 82 L51 64 L36 53 L54 53 Z" fill="${prize.accent}" opacity="0.72"/></svg>`;
+      case 'dragonfruit':
+        return `${base}${shadow}<path d="M61 25 C85 36 97 60 84 85 C70 103 45 101 34 83 C19 58 33 35 61 25Z" fill="${prize.main}"/><path d="M60 38 C79 45 87 62 78 78 C68 92 49 90 41 77 C31 60 40 45 60 38Z" fill="${prize.accent}"/><g fill="#111827"><circle cx="55" cy="57" r="2"/><circle cx="68" cy="64" r="2"/><circle cx="52" cy="75" r="2"/><circle cx="73" cy="78" r="2"/></g><path d="M34 41 L20 34 L32 53 M86 48 L102 43 L89 60 M45 29 L41 13 L56 27" fill="none" stroke="${prize.leaf}" stroke-width="5" stroke-linecap="round"/></svg>`;
+      case 'blueberries':
+        return `${base}${shadow}${leaf}<circle cx="45" cy="61" r="21" fill="${prize.main}"/><circle cx="70" cy="56" r="22" fill="#1d4ed8"/><circle cx="65" cy="80" r="20" fill="#3b82f6"/><g fill="${prize.accent}" opacity="0.62"><circle cx="39" cy="53" r="5"/><circle cx="65" cy="48" r="5"/><circle cx="59" cy="72" r="5"/></g></svg>`;
+      case 'pear':
+      default:
+        return `${base}${shadow}${stem}${leaf}<path d="M61 28 C77 31 78 51 71 61 C89 70 86 101 60 101 C34 101 31 70 49 61 C42 51 45 31 61 28Z" fill="${prize.main}"/>${shine}<path d="M50 62 C58 68 67 68 75 62" fill="none" stroke="${prize.accent}" stroke-width="5" stroke-linecap="round" opacity="0.62"/></svg>`;
+    }
+  }
+
+  function showSpecialFanfare(event) {
+    document.querySelectorAll('.fanfare-layer, .fanfare-spark').forEach(el => el.remove());
+    clearTimeout(fanfareTimer);
+
+    const duration = event.duration || 2600;
+    const layer = document.createElement('div');
+    layer.className = `fanfare-layer ${event.kind}`;
+    layer.style.setProperty('--fanfare-duration', duration + 'ms');
+
+    const card = document.createElement('div');
+    card.className = 'fanfare-card' + (event.prize ? ' has-prize' : '');
+
+    if (event.prize) {
+      const prize = document.createElement('div');
+      prize.className = 'fanfare-prize';
+      prize.innerHTML = renderPrizeSvg(event.prize);
+      card.appendChild(prize);
+    }
+
+    const copy = document.createElement('div');
+    copy.className = 'fanfare-copy';
+    const title = document.createElement('div');
+    title.className = 'fanfare-title';
+    title.textContent = event.title;
+    const subtitle = document.createElement('div');
+    subtitle.className = 'fanfare-subtitle';
+    subtitle.textContent = event.subtitle || '';
+    copy.appendChild(title);
+    if (event.subtitle) copy.appendChild(subtitle);
+    card.appendChild(copy);
+    layer.appendChild(card);
+    document.body.appendChild(layer);
+
+    const colors = ['#facc15', '#fb7185', '#38bdf8', '#4ade80', '#f97316', '#c084fc', '#ffffff'];
+    for (let i = 0; i < 22; i++) {
+      const spark = document.createElement('span');
+      spark.className = 'fanfare-spark';
+      const angle = (i / 22) * Math.PI * 2;
+      const spread = 54 + Math.random() * 115;
+      const dx = Math.cos(angle) * spread;
+      const dy = Math.sin(angle) * spread * 0.62 - 12;
+      const x = 50 + (Math.random() - 0.5) * 34;
+      const y = 24 + Math.random() * 17;
+      spark.style.setProperty('--fanfare-duration', duration + 'ms');
+      spark.style.setProperty('--x', x + 'vw');
+      spark.style.setProperty('--y', y + 'vh');
+      spark.style.setProperty('--dx', dx + 'px');
+      spark.style.setProperty('--dy', dy + 'px');
+      spark.style.setProperty('--dx2', (dx * 1.45) + 'px');
+      spark.style.setProperty('--dy2', (dy * 1.45) + 'px');
+      spark.style.setProperty('--s', (7 + Math.random() * 9) + 'px');
+      spark.style.setProperty('--c', colors[Math.floor(Math.random() * colors.length)]);
+      document.body.appendChild(spark);
+    }
+
+    sfxSpecialFanfare(event.kind);
+    fanfareTimer = setTimeout(() => {
+      layer.remove();
+      document.querySelectorAll('.fanfare-spark').forEach(el => el.remove());
+    }, duration + 160);
+  }
+
+  function canUseFanfareDebugHost() {
+    return location.hostname === 'localhost'
+      || location.hostname === '127.0.0.1'
+      || location.hostname === ''
+      || location.hostname === 'onedaygames.github.io';
+  }
+
+  function installFanfareDebugHooks() {
+    const debugHost = canUseFanfareDebugHost();
+    if (!debugHost) return;
+
+    window.TTTDebug = Object.assign(window.TTTDebug || {}, {
+      forceFanfare(kind = 'quick') {
+        const events = {
+          quick: { kind: 'quick', title: 'Quick Win!', subtitle: 'Won in only 3 moves', duration: 2450 },
+          streak: { kind: 'streak', title: '3 WINS IN A ROW!', subtitle: 'Win streak', duration: 2850 },
+          prize: makeDozenFanfare(totalPlayerWins && totalPlayerWins % 12 === 0 ? totalPlayerWins : 12),
+          dozen: makeDozenFanfare(totalPlayerWins && totalPlayerWins % 12 === 0 ? totalPlayerWins : 12),
+          more12: makeDozenFanfare(24),
+          prize24: makeDozenFanfare(24),
+          collision12: chooseSpecialFanfare(12, 3, 3),
+          collisionStreak: chooseSpecialFanfare(3, 3, 3),
+        };
+        const event = events[kind] || events.quick;
+        showSpecialFanfare(event);
+        return event;
+      },
+      previewFanfareAfterWin(totalWinsBefore = 0, streakBefore = 0, moves = 3) {
+        return chooseSpecialFanfare(totalWinsBefore + 1, streakBefore + 1, moves);
+      },
+      setFanfareState(next = {}) {
+        if (Number.isFinite(next.totalPlayerWins)) totalPlayerWins = Math.max(0, Math.floor(next.totalPlayerWins));
+        if (Number.isFinite(next.playerWinStreak)) playerWinStreak = Math.max(0, Math.floor(next.playerWinStreak));
+        if (Number.isFinite(next.playerMovesThisRound)) playerMovesThisRound = Math.max(0, Math.floor(next.playerMovesThisRound));
+        return this.fanfareState();
+      },
+      fanfareState() {
+        return { totalPlayerWins, playerWinStreak, playerMovesThisRound };
+      },
+    });
+  }
+
+  function scheduleQueryFanfare() {
+    if (!canUseFanfareDebugHost() || !cycleParams.has('qaFanfare')) return;
+    const kind = cycleParams.get('qaFanfare') || 'quick';
+    setTimeout(() => {
+      if (window.TTTDebug && typeof window.TTTDebug.forceFanfare === 'function') {
+        const event = window.TTTDebug.forceFanfare(kind);
+        if (cycleParams.has('qaReplay')) {
+          const replayDelay = _isMobile ? 1300 : 650;
+          setTimeout(() => showAttract('Play again!', event.replaySubtitle || 'One more round', 'replay'), replayDelay);
+        }
+      }
+    }, 850);
+  }
+
   function initGame() {
     gameSession++;
     clearInterval(_attractBurstTimer);
@@ -1656,6 +2084,7 @@
     current     = 'X';
     gameOver    = false;
     cpuThinking = false;
+    playerMovesThisRound = 0;
     cells.forEach(c => {
       c.innerHTML = '';
       c.classList.remove('taken', 'winner');
@@ -2022,16 +2451,27 @@
     if (winner) {
       combo.forEach(i => cells[i].classList.add('winner'));
       if (winner === 'X') {
+        const specialFanfare = p0Mode ? null : recordPlayerWinAndPickFanfare();
         scores.X++;
         scoreX.textContent = scores.X;
-        track('player_win', { round: scores.X + scores.O + scores.D });
+        track('player_win', {
+          round: scores.X + scores.O + scores.D,
+          specialFanfare: specialFanfare ? specialFanfare.kind : 'none',
+          playerMoves: playerMovesThisRound,
+        });
         setStatus('You win! 🎉', 'win-x');
-        sfxWin();
-        sunWinPulse();
         titleBurst();
-        setTimeout(celebrate, 200);
-        replaySubtitle = 'Nice win';
+        if (specialFanfare) {
+          showSpecialFanfare(specialFanfare);
+          replaySubtitle = specialFanfare.replaySubtitle || 'Nice win';
+        } else {
+          sfxWin();
+          sunWinPulse();
+          setTimeout(celebrate, 200);
+          replaySubtitle = 'Nice win';
+        }
       } else {
+        if (!p0Mode) playerWinStreak = 0;
         scores.O++;
         scoreO.textContent = scores.O;
         track('cpu_win', { round: scores.X + scores.O + scores.D });
@@ -2041,6 +2481,7 @@
         replaySubtitle = 'Try again';
       }
     } else {
+      if (!p0Mode) playerWinStreak = 0;
       scores.D++;
       scoreD.textContent = scores.D;
       track('draw', { round: scores.X + scores.O + scores.D });
@@ -2127,6 +2568,7 @@
       if (gameOver || boardOverlay.classList.contains('visible') || board[idx] || current !== 'X' || cpuThinking) return;
       _unlockAudio();
       placeMarker(idx, 'X');
+      playerMovesThisRound++;
       sfxPlayerMove();
       const combo = checkWin(board, 'X');
       if (combo) { endGame('X', combo); return; }
@@ -2137,8 +2579,10 @@
   });
 
   boardOverlay.addEventListener('click', () => { syncWorldCycle('play-sync'); _unlockAudio(); initGame(); track('game_start'); });
+  installFanfareDebugHooks();
   initGame();
   showAttract();
+  scheduleQueryFanfare();
   setWorldPhase(cycleParams.has('day') ? 'day' : 'night', cycleParams.has('day') ? 'query' : 'load');
   scheduleWorldCycle();
   scheduleShootingStar();
@@ -2158,6 +2602,7 @@
   function resetScoreDisplay() {
     scores.X = 0; scores.O = 0; scores.D = 0;
     scoreX.textContent = 0; scoreO.textContent = 0; scoreD.textContent = 0;
+    resetFanfareProgress();
   }
 
   // X plays imperfect: always wins if possible, blocks 60%, center 50%, else random
@@ -2392,6 +2837,31 @@
       _tone(f, 'triangle', t + d, 0.34, 0.07, _sDry);
       _tone(f, 'sine', t + d, 0.45, 0.035, _sWet);
     });
+  }
+
+  function sfxSpecialFanfare(kind) {
+    const t = AC.currentTime;
+    const notes = kind === 'prize'
+      ? [[392,0],[523.25,0.09],[659.25,0.18],[783.99,0.29],[1046.5,0.43],[1318.5,0.62]]
+      : kind === 'streak'
+        ? [[523.25,0],[659.25,0.10],[783.99,0.20],[1046.5,0.34],[1174.66,0.52]]
+        : [[659.25,0],[880,0.09],[1174.66,0.21],[1318.5,0.37]];
+
+    notes.forEach(([f, d], i) => {
+      const vol = kind === 'prize' ? 0.19 : 0.16;
+      _tone(f, i % 2 ? 'triangle' : 'sine', t + d, 0.42, vol, _sDry);
+      _tone(f * 2, 'sine', t + d + 0.018, 0.30, vol * 0.34, _sWet);
+    });
+
+    if (kind === 'prize') {
+      _tone(196, 'triangle', t, 0.82, 0.11, _sDry);
+      _tone(1567.98, 'sine', t + 0.88, 0.48, 0.08, _sWet);
+    } else if (kind === 'streak') {
+      _tone(392, 'triangle', t + 0.02, 0.56, 0.09, _sDry);
+      _tone(1567.98, 'sine', t + 0.70, 0.34, 0.07, _sWet);
+    } else {
+      _tone(1760, 'sine', t + 0.52, 0.25, 0.06, _sWet);
+    }
   }
 
   // ── Background music — aspirational harp-like arpeggios + melody ────────
